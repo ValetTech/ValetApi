@@ -1,0 +1,166 @@
+﻿@{
+    Layout = "_DashboardLayout";
+}
+
+<div class="container">
+    <!-- Navigation List-->
+    <div class="row">
+        <div class="col-3">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-details-list" data-toggle="list" href="#list-details" role="tab" aria-controls="details">DETAILS</a>
+                <a class="list-group-item list-group-item-action" id="list-setup-list" data-toggle="list" href="#list-setup" role="tab" aria-controls="setup">SETUP</a>
+                <a class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages">SEATING DIAGRAM</a>
+                <a class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings">SETTINGS</a>
+            </div>
+        </div>
+        <div class="col-9">
+            <!-- Navigation List Content -->
+            <div class="tab-content" id="nav-tabContent">
+                <!-- DETAILS -->
+                <div class="tab-pane fade show active" id="list-details" role="tabpanel" aria-labelledby="list-details-list">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-4">
+                                <form action="" method="post">
+                                    <h3><b><u>Details</u></b></h3>
+                                    <h6>Venue Name</h6>
+                                    <input type="text" name="venueName" class="mb-3" />
+                                    <h6>Venue Address</h6>
+                                    <input type="text" name="venueAddress" class="mb-3" />
+                                    <button type="button" class="btn btn-dark">SUBMIT</button>
+                                </form>
+                            </div>
+                            <div class="col-8 mt-4">
+                                <div class="card" style="width: 18rem;">
+                                    <div class="card-body">
+                                        <h5>Venue Name:</h5>
+                                        <h6>NAME PLACEHOLDER</h6>
+                                        <h5>Venue Address:</h5>
+                                        <h6>ADDRESS PLACEHOLDER</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- SETUP -->
+                <div class="tab-pane fade" id="list-setup" role="tabpanel" aria-labelledby="list-setup-list">
+                    <div class="container">
+                        <div class="row">
+                            <!-- Outer Card -->
+                            <div class="card" style="width: 18rem;">
+                                <div class="card-body">
+                                    <h3 class="card-title">SETUP</h3>
+                                    <div class="card" style="width: 40rem;">
+                                        <!-- Seating Area Card -->
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <h3 class="card-title">SEATING AREAS</h3>
+                                                    <form action="" method="post">
+                                                        <h6>Name</h6>
+                                                        <input type="text" name="seatingAreaName" class="" />
+                                                        <h6>Description</h6>
+                                                        <input type="text" name="seatingAreaDescription" class="" />
+                                                        <div class="row mt-4">
+                                                            <button type="button" class="btn btn-dark">ADD</button>
+                                                            <button type="button" class="btn btn-dark mt-2">DELETE</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-6">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">Cras justo odio</li>
+                                                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                                                        <li class="list-group-item">Morbi leo risus</li>
+                                                        <li class="list-group-item">Porta ac consectetur ac</li>
+                                                        <li class="list-group-item">Vestibulum at eros</li>
+                                                        <li class="list-group-item">Cras justo odio</li>
+                                                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                                                        <li class="list-group-item">Morbi leo risus</li>
+                                                        <li class="list-group-item">Porta ac consectetur ac</li>
+                                                        <li class="list-group-item">Vestibulum at eros</li>
+                                                        <li class="list-group-item">Cras justo odio</li>
+                                                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                                                        <li class="list-group-item">Morbi leo risus</li>
+                                                        <li class="list-group-item">Porta ac consectetur ac</li>
+                                                        <li class="list-group-item">Vestibulum at eros</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card mt-3" style="width: 40rem;">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <h3 class="card-title">SERVICE PERIODS</h3>
+                                                    <form action="" method="post">
+                                                        <h6>Name</h6>
+                                                        <input type="text" name="servicePeriodName" />
+                                                        <h6>Start Time</h6>
+                                                        <input type="text" name="serviceStartTime" class="" />
+                                                        <h6>End Time</h6>
+                                                        <input type="text" name="serviceEndTime" class="" />
+                                                        <div class="row mt-4">
+                                                            <button type="button" class="btn btn-dark">ADD</button>
+                                                            <button type="button" class="btn btn-dark mt-2">DELETE</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-6">
+                                                    <ul class="list-group">
+                                                        <li class="list-group-item">Cras justo odio</li>
+                                                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                                                        <li class="list-group-item">Morbi leo risus</li>
+                                                        <li class="list-group-item">Porta ac consectetur ac</li>
+                                                        <li class="list-group-item">Vestibulum at eros</li>
+                                                        <li class="list-group-item">Cras justo odio</li>
+                                                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                                                        <li class="list-group-item">Morbi leo risus</li>
+                                                        <li class="list-group-item">Porta ac consectetur ac</li>
+                                                        <li class="list-group-item">Vestibulum at eros</li>
+                                                        <li class="list-group-item">Cras justo odio</li>
+                                                        <li class="list-group-item">Dapibus ac facilisis in</li>
+                                                        <li class="list-group-item">Morbi leo risus</li>
+                                                        <li class="list-group-item">Porta ac consectetur ac</li>
+                                                        <li class="list-group-item">Vestibulum at eros</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="container">
+                    <div class="row">
+                    <div>
+                    <h3 class="text-center"><b><u>SETUP</u></b></h3>
+                    </div>
+                    </div>
+                    <div class="row">
+                    <h3><b><u>Seating Areas</u></b></h3>
+                    <form action="" method="post">
+                    <h6>Name</h6>
+                    <input type="text" name="seatingAreaName" class="mb-3" />
+                    <h6>Description</h6>
+                    <input type="text" name="seatingAreaDescription" class="mb-3" />
+                    </form>
+                    </div>
+                    <div class="row">
+                    <h3><b><u>Service Periods</u></b></h3>
+                    </div>
+                    </div>*@
+            </div>
+            <div class="tab-pane fade" id="list-messages" role="tabpanel" aria-labelledby="list-messages-list">
+            </div>
+            <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
+            </div>
+        </div>
+    </div>
+</div>
+</div>

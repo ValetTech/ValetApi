@@ -1,0 +1,65 @@
+﻿@{
+    Layout = "_DashboardLayout";
+}
+
+<div class="container">
+    <div class="row">
+
+
+        <div class="col">
+            <!-- DatePicker -->
+            <p>Date: <input type="text" id="datepicker"></p>
+            <h6>(Arrows on datepicker do not appear but they still work.)</h6>
+        </div>
+
+        <!-- Service Period/Session Dropdown -->
+        <div class="col">
+            <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Service Period/Session
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="#">Breakfast</a>
+                    <a class="dropdown-item" href="#">Lunch</a>
+                    <a class="dropdown-item" href="#">Dinner</a>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="row">
+
+        <!-- This was causing me hassle before. Every row has 12 slices. The number after the 'col' tag indicates how many portions you want the column to take up out of a total of 12.-->
+        <!-- If the slices don't add up then it will default to equal sized columns. -->
+
+        <!-- Reservation List -->
+        <div class="col-4">
+            <h3>Reservation List</h3>
+            <ul class="list-group">
+                <li class="list-group-item">Cras justo odio</li>
+                <li class="list-group-item">Dapibus ac facilisis in</li>
+                <li class="list-group-item">Morbi leo risus</li>
+                <li class="list-group-item">Porta ac consectetur ac</li>
+                <li class="list-group-item">Vestibulum at eros</li>
+                <li class="list-group-item">Cras justo odio</li>
+                <li class="list-group-item">Dapibus ac facilisis in</li>
+                <li class="list-group-item">Morbi leo risus</li>
+                <li class="list-group-item">Porta ac consectetur ac</li>
+                <li class="list-group-item">Vestibulum at eros</li>
+                <li class="list-group-item">Cras justo odio</li>
+                <li class="list-group-item">Dapibus ac facilisis in</li>
+                <li class="list-group-item">Morbi leo risus</li>
+                <li class="list-group-item">Porta ac consectetur ac</li>
+                <li class="list-group-item">Vestibulum at eros</li>
+            </ul>
+        </div>
+
+        <div class="col-8">
+            <!-- Seating Diagram-->
+            <h6>Seating diagram would go here</h6>
+        </div>
+    </div>
+
+</div>
