@@ -32,15 +32,12 @@ public class Program
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
         
-        var liveConnectionString = builder.Configuration.GetConnectionString("LiveConnection") ??
-                               throw new InvalidOperationException("Connection string 'LiveConnection' not found.");
-        
         
         
         // builder.Services.AddDbContext<ApplicationDbContext>(options =>
         //     options.UseSqlServer(connectionString));
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(liveConnectionString ??= connectionString));
+                    options.UseSqlServer(connectionString));
 
 
 
