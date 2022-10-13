@@ -9,10 +9,10 @@ public static class DbSeeder
     {
         var venues = new List<VenueEntity>
         {
-            new() { Id = 1, Name = "KFC", Address = "123 George St" },
-            new() { Id = 2, Name = "Maccas", Address = "321 Frank St" },
-            new() { Id = 3, Name = "Red Rooster", Address = "999 Kent St" },
-            new() { Id = 4, Name = "Guzman Y Gomez", Address = "555 Parade Dr" }
+            new() { Id = 1, Name = "Saki", Address = "123 George St" },
+            // new() { Id = 2, Name = "Maccas", Address = "321 Frank St" },
+            // new() { Id = 3, Name = "Red Rooster", Address = "999 Kent St" },
+            // new() { Id = 4, Name = "Guzman Y Gomez", Address = "555 Parade Dr" }
         };
 
         modelBuilder.Entity<VenueEntity>().HasData(venues);

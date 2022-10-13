@@ -12,8 +12,8 @@ using ValetAPI.Data;
 namespace ValetAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220905074714_init6")]
-    partial class init6
+    [Migration("20221013050056_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -271,69 +271,6 @@ namespace ValetAPI.Migrations
                             Description = "Upstairs away from the noise",
                             Name = "Upstairs",
                             VenueId = 1
-                        },
-                        new
-                        {
-                            Id = 21,
-                            Description = "Gorgeous Main Dining AreaEntity",
-                            Name = "Main Dining",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 22,
-                            Description = "Outside with a view",
-                            Name = "Outside",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 23,
-                            Description = "Upstairs away from the noise",
-                            Name = "Upstairs",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 31,
-                            Description = "Gorgeous Main Dining AreaEntity",
-                            Name = "Main Dining",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 32,
-                            Description = "Outside with a view",
-                            Name = "Outside",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 33,
-                            Description = "Upstairs away from the noise",
-                            Name = "Upstairs",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 41,
-                            Description = "Gorgeous Main Dining AreaEntity",
-                            Name = "Main Dining",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 42,
-                            Description = "Outside with a view",
-                            Name = "Outside",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 43,
-                            Description = "Upstairs away from the noise",
-                            Name = "Upstairs",
-                            VenueId = 4
                         });
                 });
 
@@ -396,141 +333,6 @@ namespace ValetAPI.Migrations
                         {
                             AreaId = 13,
                             SittingId = 133
-                        },
-                        new
-                        {
-                            AreaId = 21,
-                            SittingId = 211
-                        },
-                        new
-                        {
-                            AreaId = 21,
-                            SittingId = 212
-                        },
-                        new
-                        {
-                            AreaId = 21,
-                            SittingId = 213
-                        },
-                        new
-                        {
-                            AreaId = 22,
-                            SittingId = 221
-                        },
-                        new
-                        {
-                            AreaId = 22,
-                            SittingId = 222
-                        },
-                        new
-                        {
-                            AreaId = 22,
-                            SittingId = 223
-                        },
-                        new
-                        {
-                            AreaId = 23,
-                            SittingId = 231
-                        },
-                        new
-                        {
-                            AreaId = 23,
-                            SittingId = 232
-                        },
-                        new
-                        {
-                            AreaId = 23,
-                            SittingId = 233
-                        },
-                        new
-                        {
-                            AreaId = 31,
-                            SittingId = 311
-                        },
-                        new
-                        {
-                            AreaId = 31,
-                            SittingId = 312
-                        },
-                        new
-                        {
-                            AreaId = 31,
-                            SittingId = 313
-                        },
-                        new
-                        {
-                            AreaId = 32,
-                            SittingId = 321
-                        },
-                        new
-                        {
-                            AreaId = 32,
-                            SittingId = 322
-                        },
-                        new
-                        {
-                            AreaId = 32,
-                            SittingId = 323
-                        },
-                        new
-                        {
-                            AreaId = 33,
-                            SittingId = 331
-                        },
-                        new
-                        {
-                            AreaId = 33,
-                            SittingId = 332
-                        },
-                        new
-                        {
-                            AreaId = 33,
-                            SittingId = 333
-                        },
-                        new
-                        {
-                            AreaId = 41,
-                            SittingId = 411
-                        },
-                        new
-                        {
-                            AreaId = 41,
-                            SittingId = 412
-                        },
-                        new
-                        {
-                            AreaId = 41,
-                            SittingId = 413
-                        },
-                        new
-                        {
-                            AreaId = 42,
-                            SittingId = 421
-                        },
-                        new
-                        {
-                            AreaId = 42,
-                            SittingId = 422
-                        },
-                        new
-                        {
-                            AreaId = 42,
-                            SittingId = 423
-                        },
-                        new
-                        {
-                            AreaId = 43,
-                            SittingId = 431
-                        },
-                        new
-                        {
-                            AreaId = 43,
-                            SittingId = 432
-                        },
-                        new
-                        {
-                            AreaId = 43,
-                            SittingId = 433
                         });
                 });
 
@@ -745,249 +547,6 @@ namespace ValetAPI.Migrations
                             StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
                             Type = "Dinner",
                             VenueId = 1
-                        },
-                        new
-                        {
-                            Id = 211,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 212,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 213,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 221,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 222,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 223,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 231,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 232,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 233,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 2
-                        },
-                        new
-                        {
-                            Id = 311,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 312,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 313,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 321,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 322,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 323,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 331,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 332,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 333,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 3
-                        },
-                        new
-                        {
-                            Id = 411,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 412,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 413,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 421,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 422,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 423,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 431,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Breakfast",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 432,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Lunch",
-                            VenueId = 4
-                        },
-                        new
-                        {
-                            Id = 433,
-                            Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
-                            Type = "Dinner",
-                            VenueId = 4
                         });
                 });
 
@@ -1005,7 +564,7 @@ namespace ValetAPI.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReservationId")
+                    b.Property<int?>("ReservationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -1049,25 +608,7 @@ namespace ValetAPI.Migrations
                         {
                             Id = 1,
                             Address = "123 George St",
-                            Name = "KFC"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Address = "321 Frank St",
-                            Name = "Maccas"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Address = "999 Kent St",
-                            Name = "Red Rooster"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            Address = "555 Parade Dr",
-                            Name = "Guzman Y Gomez"
+                            Name = "Saki"
                         });
                 });
 
@@ -1200,9 +741,7 @@ namespace ValetAPI.Migrations
 
                     b.HasOne("ValetAPI.Models.ReservationEntity", "Reservation")
                         .WithMany("Tables")
-                        .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ReservationId");
 
                     b.Navigation("Area");
 
