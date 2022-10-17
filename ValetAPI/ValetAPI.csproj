@@ -898,4 +898,8 @@
     <_ContentIncludedByDefault Remove="Areas\Dashboard\Views\Home\Venue.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations" />
+  </ItemGroup>
+
 </Project>
