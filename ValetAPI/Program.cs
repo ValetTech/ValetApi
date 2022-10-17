@@ -153,6 +153,7 @@ public class Program
             options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             options.RoutePrefix = string.Empty;
             options.DefaultModelExpandDepth(-1);
+            options.InjectStylesheet("/swagger-ui/SwaggerDark.css");
         });
         app.UseSwagger(options =>
         {
