@@ -15,6 +15,5 @@ public class Customer
     public string? Phone { get; set; }
     public List<Reservation> Reservations { get; set; } = new List<Reservation>();
     [Display(Name = "Full Name")]
-    [JsonIgnore]
-    public string FullName => LastName + ", " + FirstName;
+    public string? FullName => LastName + ", " + FirstName;
 }
