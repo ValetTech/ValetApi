@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using NuGet.Protocol.Plugins;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using Newtonsoft.Json.Converters;
 using ValetAPI.Data;
 using ValetAPI.Hubs;
 using ValetAPI.Models;
@@ -55,15 +56,18 @@ public class Program
             .AddEntityFrameworkStores<ApplicationDbContext>();
         builder.Services.AddControllersWithViews();
         builder.Services.AddControllers()
-            .AddNewtonsoftJson();
+            .AddNewtonsoftJson()
+            .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+            .AddNewtonsoftJson(x => x.SerializerSettings.Converters.Add(new StringEnumConverter()));
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo { Title = "ValetAPI", Version = "v1" });
+            options.SwaggerDoc("v1", new OpenApiInfo {Title = "ValetAPI", Version = "v1"});
             options.SchemaFilter<SwaggerSchemaFilter>();
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
         });
+        builder.Services.AddSwaggerGenNewtonsoftSupport();
 
         builder.Services.AddRouting(options => options.LowercaseUrls = true);
         builder.Services.AddApiVersioning(options =>

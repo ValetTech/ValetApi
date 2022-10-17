@@ -1,7 +1,16 @@
-﻿namespace ValetAPI.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
+namespace ValetAPI.Models;
+
+/// <inheritdoc />
 public class SittingQueryParameters : QueryParameters
 {
-    public bool Available { get; set; } = false;
-    public bool Taken { get; set; } = false;
+    public DateTime? Date { get; set; } 
+    public DateTime? DateTime { get; set; } 
+    [EnumDataType(typeof(SittingType))]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public SittingType? Type { get; set; } 
+    
 }

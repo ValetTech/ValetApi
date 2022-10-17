@@ -15,6 +15,5 @@ public class Customer
     public string? Phone { get; set; }
     public List<Reservation> Reservations { get; set; } = new List<Reservation>();
     public bool IsVip { get; set; } = false;
-    [Display(Name = "Full Name")]
-    public string? FullName => LastName + ", " + FirstName;
+    public string? FullName => FirstName + " " + LastName;
 }

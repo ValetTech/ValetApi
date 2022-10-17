@@ -33,9 +33,28 @@ public class SittingsController : ControllerBase
     [HttpGet("", Name = nameof(GetSittings))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Sitting>>> GetSittings()
+    public async Task<ActionResult<IEnumerable<Sitting>>> GetSittings([FromQuery] SittingQueryParameters queryParameters)
     {
         var sittings = await _sittingService.GetSittingsAsync();
+
+        if (queryParameters.Date != null)
+        {
+            var date = queryParameters.Date.Value.Date;
+            sittings = sittings.Where(s => date <= s.EndTime.Date && date >= s.StartTime.Date);
+        }
+
+        if (queryParameters.DateTime != null)
+        {
+            var dateTime = queryParameters.DateTime.Value;
+            sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
+        }
+
+        if (queryParameters.Type != null)
+        {
+            var type = queryParameters.Type.Value;
+            sittings = sittings.Where(s => s.Type == type);
+        }
+        
         if (sittings == null) return NotFound();
         return Ok(sittings);
     }
@@ -143,7 +162,7 @@ public class SittingsController : ControllerBase
     [HttpGet("{id:int}/tables", Name = nameof(GetSittingTables))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Table>>> GetSittingTables(int id, [FromQuery] SittingQueryParameters queryParameters)
+    public async Task<ActionResult<IEnumerable<Table>>> GetSittingTables(int id, [FromQuery] SittingTableQueryParameters queryParameters)
     {
         var tables = await _sittingService.GetTablesAsync(id);
 
@@ -166,5 +185,27 @@ public class SittingsController : ControllerBase
 
         return Ok(tables);
     }
+
+    /// <summary>
+    /// Get all sitting types
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    [HttpGet("types", Name = nameof(GetSittingTypes))]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult<IEnumerable<SittingType>>> GetSittingTypes([FromQuery] DateTime? date)
+    {
+        var types = Enum.GetNames(typeof(SittingType));
+
+        if (date == null) return Ok(types);
+
+        
+        var sittings = await _sittingService.GetSittingsAsync();
+        types = sittings.Where(s=>date>=s.StartTime.Date && date<=s.EndTime.Date).Select(s => s.Type.ToString()).Distinct().ToArray();
+
+        return Ok(types);
+    }
+
 }
 

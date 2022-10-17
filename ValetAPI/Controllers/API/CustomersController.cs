@@ -70,7 +70,7 @@ public class CustomersController : ControllerBase
     {
         var id = await _customerService.CreateCustomerAsync(customer);
         var entity = await _customerService.GetCustomerAsync(id);
-        return Created($"api/customer/{id}", entity);
+        return Created($"api/customers/{id}", entity);
     }
 
 

@@ -28,7 +28,6 @@ public class ApplicationDbContext : IdentityDbContext
         mb.Seed();
 
         mb.Entity<SittingEntity>().Property(s=>s.Type).HasConversion<string>().IsRequired();
-        // mb.Entity<SittingEntity>().Property(s=>s.Type).HasConversion<int>().IsRequired(); //TODO int or string 
 
         // mb.Entity<VenueEntity>()
         //     .Property(b => b.Id)

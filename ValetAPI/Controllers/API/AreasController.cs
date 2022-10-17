@@ -181,4 +181,6 @@ public class AreasController : ControllerBase
         if (sittings == null) return NotFound();
         return Ok(sittings);
     }
+    
+    
 }

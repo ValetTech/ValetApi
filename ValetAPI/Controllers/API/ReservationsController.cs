@@ -45,12 +45,19 @@ public class ReservationsController : ControllerBase
         {
             reservations = reservations.Where(r => r.DateTime <= queryParameters.MaxDate.Value);
         }
+        
+        if (queryParameters.Date != null)
+        {
+            reservations = reservations.Where(r => r.DateTime.Date == queryParameters.Date.Value.Date);
+        }
 
         reservations = reservations
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
             .Take(queryParameters.Size);
 
         if (reservations == null) return NotFound();
+        
+        
 
         var details = await reservations.Select(r => new
         {
@@ -67,7 +74,7 @@ public class ReservationsController : ControllerBase
         })
             .ToArrayAsync();
 
-        return Ok(details);
+        return Ok(await reservations.ToArrayAsync());
 
 
     }

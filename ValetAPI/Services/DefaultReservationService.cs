@@ -62,10 +62,10 @@ public class DefaultReservationService : IReservationService
 
         var reservations = _context
             .Reservations
-            .Include(r => r.Customer)
-            .Include(r => r.Tables)
-            .Include(r => r.Sitting)
-            .Include(r => r.Venue)
+            // .Include(r => r.Customer)
+            // .Include(r => r.Tables)
+            // .Include(r => r.Sitting)
+            // .Include(r => r.Venue)
             .AsQueryable();
             // .Include(r=>r.)
             // .Select(r=> new
