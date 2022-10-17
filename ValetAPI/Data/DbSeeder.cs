@@ -44,14 +44,14 @@ public static class DbSeeder
             sittings.Add(new SittingEntity
             {
                 Id = area.Id * 10 + 1,
-                VenueId = area.VenueId, Capacity = 50, Type = "Breakfast",
+                VenueId = area.VenueId, Capacity = 50, Type = SittingType.Breakfast,
                 StartTime = new DateTime(2022, 12, 25, 10, 30, 00), EndTime = new DateTime(2022, 12, 25, 12, 30, 00)
             });
             areaSittings.Add(new AreaSittingEntity { SittingId = area.Id * 10 + 1, AreaId = area.Id });
             sittings.Add(new SittingEntity
             {
                 Id = area.Id * 10 + 2,
-                VenueId = area.VenueId, Capacity = 50, Type = "Lunch",
+                VenueId = area.VenueId, Capacity = 50, Type = SittingType.Lunch,
                 StartTime = new DateTime(2022, 12, 25, 13, 00, 00), EndTime = new DateTime(2022, 12, 25, 16, 00, 00)
             });
             areaSittings.Add(new AreaSittingEntity { SittingId = area.Id * 10 + 2, AreaId = area.Id });
@@ -59,7 +59,7 @@ public static class DbSeeder
             sittings.Add(new SittingEntity
             {
                 Id = area.Id * 10 + 3,
-                VenueId = area.VenueId, Capacity = 50, Type = "Dinner",
+                VenueId = area.VenueId, Capacity = 50, Type = SittingType.Dinner,
                 StartTime = new DateTime(2022, 12, 25, 17, 30, 00), EndTime = new DateTime(2022, 12, 25, 23, 00, 00)
             });
             areaSittings.Add(new AreaSittingEntity { SittingId = area.Id * 10 + 3, AreaId = area.Id });

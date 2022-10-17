@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using ValetAPI.Models;
-using System.Reflection.Emit;
 
 namespace ValetAPI.Data;
 
@@ -15,6 +13,7 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<ReservationEntity> Reservations { get; set; }
     public DbSet<CustomerEntity> Customers { get; set; }
     public DbSet<AreaSittingEntity> AreaSittings { get; set; }
+    // public DbSet<SittingType> SittingTypes { get; set; }
 
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
@@ -27,6 +26,9 @@ public class ApplicationDbContext : IdentityDbContext
         base.OnModelCreating(mb);
 
         mb.Seed();
+
+        mb.Entity<SittingEntity>().Property(s=>s.Type).HasConversion<string>().IsRequired();
+        // mb.Entity<SittingEntity>().Property(s=>s.Type).HasConversion<int>().IsRequired(); //TODO int or string 
 
         // mb.Entity<VenueEntity>()
         //     .Property(b => b.Id)
