@@ -167,7 +167,7 @@ public static class Program
     }
 }
 
-internal abstract class SwaggerSchemaFilter : ISchemaFilter
+internal class SwaggerSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
