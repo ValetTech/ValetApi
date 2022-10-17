@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using NuGet.Protocol.Plugins;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
 using Newtonsoft.Json.Converters;
@@ -16,7 +15,7 @@ namespace ValetAPI;
 /// <summary>
 /// Entry to the program
 /// </summary>
-public class Program
+public static class Program
 {
     /// <summary>
     /// Main
@@ -168,11 +167,11 @@ public class Program
     }
 }
 
-internal class SwaggerSchemaFilter : ISchemaFilter
+internal abstract class SwaggerSchemaFilter : ISchemaFilter
 {
     public void Apply(OpenApiSchema schema, SchemaFilterContext context)
     {
-        var keys = new System.Collections.Generic.List<string>();
+        var keys = new List<string>();
         const string prefix = "_";
         const string suffix = "Entity";
         foreach (var key in context.SchemaRepository.Schemas.Keys)
