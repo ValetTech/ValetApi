@@ -896,6 +896,7 @@
     <_ContentIncludedByDefault Remove="Areas\Dashboard\Views\Home\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Dashboard\Views\Home\Reservations.cshtml" />
     <_ContentIncludedByDefault Remove="Areas\Dashboard\Views\Home\Venue.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Identity\Pages\_ViewStart.cshtml" />
   </ItemGroup>
 
   <ItemGroup>
