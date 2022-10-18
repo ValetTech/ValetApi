@@ -18,7 +18,7 @@ public interface ISittingService
     // ********* CRUD *********
 
     // Get all Sittings
-    Task<IEnumerable<Sitting>> GetSittingsAsync();
+    IQueryable<Sitting> GetSittingsAsync();
     // Get Sitting by Id
     Task<Sitting> GetSittingAsync(int sittingId);
     // Create Sitting
@@ -37,4 +37,6 @@ public interface ISittingService
     Task<IQueryable<Table>> GetTablesAsync(int sittingId);
     Task<IQueryable<Table>> GetAvailableTablesAsync(int sittingId);
     Task<IQueryable<Table>> GetTakenTablesAsync(int sittingId);
+    Task<Sitting> AddAreasToSitting(int sittingId, IEnumerable<int> areas);
+
 }

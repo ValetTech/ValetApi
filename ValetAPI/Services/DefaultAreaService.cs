@@ -18,10 +18,14 @@ public class DefaultAreaService : IAreaService
     }
 
 
-    public async Task<IEnumerable<Area>> GetAreasAsync()
+    public IQueryable<Area> GetAreasAsync()
     {
         if (_context.Areas == null) return null;
-        return await _context.Areas.ProjectTo<Area>(_mappingConfiguration).ToArrayAsync();
+        return _context.Areas
+            .Include(a=>a.AreaSittings)
+            .ThenInclude(sa=>sa.Sitting)
+            .Include(a=>a.Tables)
+            .ProjectTo<Area>(_mappingConfiguration).AsQueryable();
     }
 
     public async Task<Area> GetAreaAsync(int areaId)
@@ -30,6 +34,7 @@ public class DefaultAreaService : IAreaService
 
         var area = await _context.Areas
             // .ProjectTo<Venue>(_mappingConfiguration)
+            .Include(a=>a.Tables)
             .SingleOrDefaultAsync(a => a.Id == areaId);
 
         if (area == null) return null;

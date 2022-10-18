@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace ValetAPI.Models;
 
@@ -12,8 +13,10 @@ public class Area
     public string? Description { get; set; }
 
     // Tables
-    public int NoTables { get; set; } = 0;
-    public int TableCapacity { get; set; } = 0;
+    [JsonIgnore]
+    public int? NoTables { get; set; } 
+    [JsonIgnore]
+    public int? TableCapacity { get; set; }
 
 
     // size

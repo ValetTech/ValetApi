@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ValetAPI.Models;
 using ValetAPI.Services;
 
@@ -36,11 +37,17 @@ public class AreasController : ControllerBase
     [HttpGet("", Name = nameof(GetAreas))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Area>>> GetAreas()
+public async Task<ActionResult<IEnumerable<Area>>> GetAreas([FromQuery] DateTime? date)
     {
-        var areas = await _areaService.GetAreasAsync();
+        var areas = _areaService.GetAreasAsync();
+
+        if (date.HasValue)
+        {
+            areas = areas.Where(a => a.Sittings.Any(s=>date!.Value.Date <= s.EndTime && date!.Value.Date >= s.StartTime));
+            // Outta left join
+        }
         if (areas == null) return NotFound();
-        return Ok(areas);
+        return Ok(await areas.ToArrayAsync());
     }
 
     /// <summary>
@@ -86,9 +93,9 @@ public class AreasController : ControllerBase
     {
         var areaId = await _areaService.CreateAreaAsync(area);
 
-        if (area.NoTables != 0 && area.TableCapacity != 0)
+        if (area.NoTables.HasValue && area.TableCapacity.HasValue)
         {
-            await _tablesService.CreateTablesAsync(area.NoTables, area.TableCapacity, areaId);
+            await _tablesService.CreateTablesAsync(area.NoTables.Value, area.TableCapacity.Value, areaId);
         }
 
 

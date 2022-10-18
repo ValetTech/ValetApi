@@ -48,6 +48,13 @@ public class DefaultTableService : ITableService
         return entity.Entity.Id;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="noTables"></param>
+    /// <param name="tableCapacity"></param>
+    /// <param name="areaId"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public async Task CreateTablesAsync(int noTables, int tableCapacity, int areaId)
     {
         var mapper = _mappingConfiguration.CreateMapper();

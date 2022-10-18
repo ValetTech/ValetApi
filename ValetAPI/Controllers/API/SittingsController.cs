@@ -35,7 +35,7 @@ public class SittingsController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<IEnumerable<Sitting>>> GetSittings([FromQuery] SittingQueryParameters queryParameters)
     {
-        var sittings = await _sittingService.GetSittingsAsync();
+        var sittings = _sittingService.GetSittingsAsync();
 
         if (queryParameters.Date != null)
         {
@@ -56,7 +56,7 @@ public class SittingsController : ControllerBase
         }
         
         if (sittings == null) return NotFound();
-        return Ok(sittings);
+        return Ok(await sittings.ToArrayAsync());
     }
 
     
@@ -201,10 +201,28 @@ public class SittingsController : ControllerBase
         if (date == null) return Ok(types);
 
         
-        var sittings = await _sittingService.GetSittingsAsync();
-        types = sittings.Where(s=>date>=s.StartTime.Date && date<=s.EndTime.Date).Select(s => s.Type.ToString()).Distinct().ToArray();
+        var sittings = _sittingService.GetSittingsAsync();
+        types = await sittings.Where(s=>date>=s.StartTime.Date && date<=s.EndTime.Date).Select(s => s.Type.ToString()).Distinct().ToArrayAsync();
 
         return Ok(types);
+    }
+    
+    
+    
+    /// <summary>
+    /// Add Areas to Sitting
+    /// </summary>
+    /// <param name="id">Sitting Id</param>
+    /// <param name="areas">List of area Ids</param>
+    /// <returns></returns>
+    [HttpPost("{id:int}/areas", Name = nameof(AddAreasToSitting))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult<Sitting>> AddAreasToSitting(int id, [FromBody] List<int> areas)
+    {
+        
+        var sitting = await _sittingService.AddAreasToSitting(id, areas);
+        return Ok(sitting);
     }
 
 }

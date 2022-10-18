@@ -13,7 +13,7 @@ public interface IAreaService
     // ********* CRUD *********
 
     // Get all Areas
-    Task<IEnumerable<Area>> GetAreasAsync();
+    IQueryable<Area> GetAreasAsync();
     // Get Area by Id
     Task<Area> GetAreaAsync(int areaId);
     // Create Area
