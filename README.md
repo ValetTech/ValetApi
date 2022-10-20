@@ -1,4 +1,9 @@
+<!-- ![logo](https://user-images.githubusercontent.com/1101045/197079045-c3cc159e-1852-460f-8515-38408eb23f00.png) -->
+![logoV](https://user-images.githubusercontent.com/1101045/197079368-52a8f201-a61c-4be8-a2ad-d61ce88cecde.png)
+
+
 # Valet REST API
+
 
 <!--
 ---
@@ -31,7 +36,7 @@ This API is for the VALET Reservation Management System.
 Table of Contents
 =================
 
-   * [API Manifesto](#api-manifesto)
+   * [Valet API](# Valet REST API)
       * [Introduction](#introduction)
    * [Table of Contents](#table-of-contents)
    * [Requests](#requests)
