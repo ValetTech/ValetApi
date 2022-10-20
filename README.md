@@ -36,7 +36,7 @@ This API is for the VALET Reservation Management System.
 Table of Contents
 =================
 
-   * [Valet API](# Valet REST API)
+   * [Valet API](#Valet REST API)
       * [Introduction](#introduction)
    * [Table of Contents](#table-of-contents)
    * [Requests](#requests)
