@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Converters;
 using ValetAPI.Data;
 using ValetAPI.Hubs;
@@ -81,6 +82,7 @@ public static class Program
         builder.Services.AddAutoMapper(options => options.AddProfile<MapperProfile>());
 
 
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy("AllowMyApp", policy => policy.AllowAnyOrigin());
@@ -106,6 +108,7 @@ public static class Program
         var app = builder.Build();
 
         app.UseDefaultFiles();
+        app.UseStaticFiles();
 
 
         // Configure the HTTP request pipeline.
@@ -126,7 +129,8 @@ public static class Program
 
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
+        
+        
 
         app.UseRouting();
 
