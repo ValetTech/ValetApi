@@ -146,7 +146,9 @@ public class DefaultSittingService : ISittingService
             .ThenInclude(a => a.Area)
             .ThenInclude(a=> a.Tables)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
-
+        
+        
+        
         if (sitting == null) return null;
 
         var tables = sitting!.AreaSittings

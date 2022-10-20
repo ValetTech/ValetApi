@@ -19,11 +19,9 @@ public class Reservation
     public int Duration { get; set; } // Minutes
     [Display(Name = "No. of Guests")]
     public int NoGuests { get; set; }
-    [JsonIgnore]
     public Source? Source { get; set; } 
     //public Venue Venue { get; set; }
     public List<Table> Tables { get; set; } = new List<Table>();
-    [JsonIgnore]
     public State Status { get; set; } = State.Pending;
     public string? Notes { get; set; }
 

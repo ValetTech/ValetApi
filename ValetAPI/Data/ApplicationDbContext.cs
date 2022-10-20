@@ -28,6 +28,8 @@ public class ApplicationDbContext : IdentityDbContext
         base.OnModelCreating(mb);
 
         mb.Seed();
+        
+        
 
         mb.Entity<SittingEntity>().Property(s=>s.Type).HasConversion<string>().IsRequired();
         mb.Entity<ReservationEntity>().Property(r=>r.Source).HasConversion<string>().IsRequired();

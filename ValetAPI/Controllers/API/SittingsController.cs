@@ -56,6 +56,7 @@ public class SittingsController : ControllerBase
         }
         
         if (sittings == null) return NotFound();
+        if (!sittings.Any()) return NoContent();
         return Ok(await sittings.ToArrayAsync());
     }
 
@@ -154,6 +155,30 @@ public class SittingsController : ControllerBase
     }
 
     /// <summary>
+    /// Get all sitting types
+    /// </summary>
+    /// <param name="date"></param>
+    /// <returns></returns>
+    [HttpGet("types", Name = nameof(GetSittingTypes))]
+    [ProducesResponseType(404)]
+    [ProducesResponseType(200)]
+    public async Task<ActionResult<IEnumerable<SittingType>>> GetSittingTypes([FromQuery] DateTime? date)
+    {
+        var types = Enum.GetNames(typeof(SittingType));
+
+        if (date != null)
+        {
+            var sittings = _sittingService.GetSittingsAsync();
+            types = await sittings.Where(s=>date>=s.StartTime.Date && date<=s.EndTime.Date).Select(s => s.Type.ToString()).Distinct().ToArrayAsync();
+
+        }
+
+        if (types.Length == 0) return NoContent();
+
+        return Ok(types);
+    }
+
+    /// <summary>
     /// Get all tables for a sitting.
     /// </summary>
     /// <param name="id">Sitting Id</param>
@@ -186,29 +211,7 @@ public class SittingsController : ControllerBase
         return Ok(tables);
     }
 
-    /// <summary>
-    /// Get all sitting types
-    /// </summary>
-    /// <param name="date"></param>
-    /// <returns></returns>
-    [HttpGet("types", Name = nameof(GetSittingTypes))]
-    [ProducesResponseType(404)]
-    [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<SittingType>>> GetSittingTypes([FromQuery] DateTime? date)
-    {
-        var types = Enum.GetNames(typeof(SittingType));
 
-        if (date == null) return Ok(types);
-
-        
-        var sittings = _sittingService.GetSittingsAsync();
-        types = await sittings.Where(s=>date>=s.StartTime.Date && date<=s.EndTime.Date).Select(s => s.Type.ToString()).Distinct().ToArrayAsync();
-
-        return Ok(types);
-    }
-    
-    
-    
     /// <summary>
     /// Add Areas to Sitting
     /// </summary>
