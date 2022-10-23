@@ -14,12 +14,16 @@ public interface IAreaService
 
     // Get all Areas
     IQueryable<Area> GetAreasAsync();
+
     // Get Area by Id
     Task<Area> GetAreaAsync(int areaId);
+
     // Create Area
     Task<int> CreateAreaAsync(Area area);
+
     // Delete Area by Id
     Task DeleteAreaAsync(int areaId);
+
     // Update Area 
     Task UpdateAreaAsync(Area area);
 
@@ -27,6 +31,7 @@ public interface IAreaService
 
     // Get tables by area Id
     Task<IEnumerable<Table>> GetTablesAsync(int areaId);
+
     // Get sittings by area Id
     Task<IEnumerable<Sitting>> GetSittingsAsync(int areaId);
 

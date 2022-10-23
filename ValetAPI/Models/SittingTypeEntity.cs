@@ -1,7 +1,6 @@
 namespace ValetAPI.Models;
 
 /// <summary>
-/// 
 /// </summary>
 public class SittingTypeEntity
 {

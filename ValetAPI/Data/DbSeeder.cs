@@ -9,7 +9,7 @@ public static class DbSeeder
     {
         var venues = new List<VenueEntity>
         {
-            new() { Id = 1, Name = "Saki", Address = "123 George St" },
+            new() {Id = 1, Name = "Saki", Address = "123 George St"}
             // new() { Id = 2, Name = "Maccas", Address = "321 Frank St" },
             // new() { Id = 3, Name = "Red Rooster", Address = "999 Kent St" },
             // new() { Id = 4, Name = "Guzman Y Gomez", Address = "555 Parade Dr" }
@@ -26,7 +26,7 @@ public static class DbSeeder
                 Description = "Gorgeous Main Dining AreaEntity"
             });
             areas.Add(new AreaEntity
-                { Id = venue.Id * 10 + 2, VenueId = venue.Id, Name = "Outside", Description = "Outside with a view" });
+                {Id = venue.Id * 10 + 2, VenueId = venue.Id, Name = "Outside", Description = "Outside with a view"});
             areas.Add(new AreaEntity
             {
                 Id = venue.Id * 10 + 3, VenueId = venue.Id, Name = "Upstairs",
@@ -47,14 +47,14 @@ public static class DbSeeder
                 VenueId = area.VenueId, Capacity = 50, Type = SittingType.Breakfast,
                 StartTime = new DateTime(2022, 12, 25, 10, 30, 00), EndTime = new DateTime(2022, 12, 25, 12, 30, 00)
             });
-            areaSittings.Add(new AreaSittingEntity { SittingId = area.Id * 10 + 1, AreaId = area.Id });
+            areaSittings.Add(new AreaSittingEntity {SittingId = area.Id * 10 + 1, AreaId = area.Id});
             sittings.Add(new SittingEntity
             {
                 Id = area.Id * 10 + 2,
                 VenueId = area.VenueId, Capacity = 50, Type = SittingType.Lunch,
                 StartTime = new DateTime(2022, 12, 25, 13, 00, 00), EndTime = new DateTime(2022, 12, 25, 16, 00, 00)
             });
-            areaSittings.Add(new AreaSittingEntity { SittingId = area.Id * 10 + 2, AreaId = area.Id });
+            areaSittings.Add(new AreaSittingEntity {SittingId = area.Id * 10 + 2, AreaId = area.Id});
 
             sittings.Add(new SittingEntity
             {
@@ -62,7 +62,7 @@ public static class DbSeeder
                 VenueId = area.VenueId, Capacity = 50, Type = SittingType.Dinner,
                 StartTime = new DateTime(2022, 12, 25, 17, 30, 00), EndTime = new DateTime(2022, 12, 25, 23, 00, 00)
             });
-            areaSittings.Add(new AreaSittingEntity { SittingId = area.Id * 10 + 3, AreaId = area.Id });
+            areaSittings.Add(new AreaSittingEntity {SittingId = area.Id * 10 + 3, AreaId = area.Id});
         }
 
         modelBuilder.Entity<SittingEntity>().HasData(sittings);

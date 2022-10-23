@@ -49,7 +49,6 @@ public class DefaultTableService : ITableService
     }
 
     /// <summary>
-    /// 
     /// </summary>
     /// <param name="noTables"></param>
     /// <param name="tableCapacity"></param>
@@ -62,14 +61,12 @@ public class DefaultTableService : ITableService
         var tables = new List<Table>();
 
         for (var i = 0; i < noTables; i++)
-        {
             tables.Add(new Table
             {
                 Type = "Square",
                 AreaId = areaId,
                 Capacity = tableCapacity
             });
-        }
 
         await _context.Tables.AddRangeAsync(mapper.Map<TableEntity[]>(tables));
 
@@ -98,9 +95,8 @@ public class DefaultTableService : ITableService
 
 
         _context.Entry(entity).CurrentValues.SetValues(mapper.Map<TableEntity>(table));
-        
+
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not update table.");
-
     }
 }

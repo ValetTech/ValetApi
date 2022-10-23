@@ -17,7 +17,7 @@ public interface ICustomerService
     // ********* CRUD *********
 
     // Get all Customers
-    Task<IEnumerable<Customer>> GetCustomersAsync();
+    Task<IQueryable<Customer>> GetCustomersAsync();
 
     // Get Customer by Id
     Task<Customer> GetCustomerAsync(int customerId);

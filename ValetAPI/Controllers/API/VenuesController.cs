@@ -1,14 +1,11 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ValetAPI.Data;
+﻿using Microsoft.AspNetCore.Mvc;
 using ValetAPI.Models;
 using ValetAPI.Services;
 
 namespace ValetAPI.Controllers.API;
 
 /// <summary>
-/// Venues controller
+///     Venues controller
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
@@ -17,7 +14,7 @@ public class VenuesController : ControllerBase
     private readonly IVenueService _venueService;
 
     /// <summary>
-    /// Venues constructor
+    ///     Venues constructor
     /// </summary>
     /// <param name="venueService"></param>
     public VenuesController(IVenueService venueService)
@@ -27,7 +24,7 @@ public class VenuesController : ControllerBase
 
 
     /// <summary>
-    /// Get all venues.
+    ///     Get all venues.
     /// </summary>
     /// <returns>All venues</returns>
     /// <response code="200">Returns all venues</response>
@@ -43,7 +40,7 @@ public class VenuesController : ControllerBase
     }
 
     /// <summary>
-    /// Get venue by id.
+    ///     Get venue by id.
     /// </summary>
     /// <param name="id">Venue Id</param>
     /// <returns>Venue</returns>
@@ -55,11 +52,10 @@ public class VenuesController : ControllerBase
         var venue = await _venueService.GetVenueAsync(id);
         if (venue == null) return NotFound();
         return Ok(venue);
-        
     }
 
     /// <summary>
-    /// Update venue.
+    ///     Update venue.
     /// </summary>
     /// <param name="id">Venue Id</param>
     /// <param name="venue">Venue Object</param>
@@ -77,7 +73,7 @@ public class VenuesController : ControllerBase
     }
 
     /// <summary>
-    /// Create new venue.
+    ///     Create new venue.
     /// </summary>
     /// <param name="venue">Venue Object</param>
     /// <returns>Newly created venue</returns>
@@ -86,14 +82,13 @@ public class VenuesController : ControllerBase
     [ProducesResponseType(201)]
     public async Task<ActionResult<Venue>> CreateVenue(Venue venue)
     {
-
         var venueId = await _venueService.CreateVenueAsync(venue);
         var venueEntity = await _venueService.GetVenueAsync(venueId);
         return Created($"api/venue/{venueId}", venueEntity);
     }
 
     /// <summary>
-    /// Delete venue.
+    ///     Delete venue.
     /// </summary>
     /// <param name="id">Venue Id</param>
     /// <returns></returns>
@@ -108,7 +103,7 @@ public class VenuesController : ControllerBase
     }
 
     /// <summary>
-    /// Gets areas for a venue.
+    ///     Gets areas for a venue.
     /// </summary>
     /// <param name="id">Venue Id</param>
     /// <returns></returns>
@@ -124,7 +119,7 @@ public class VenuesController : ControllerBase
     }
 
     /// <summary>
-    /// Get sittings for a venue.
+    ///     Get sittings for a venue.
     /// </summary>
     /// <param name="id">Venue Id</param>
     /// <returns></returns>
@@ -140,7 +135,7 @@ public class VenuesController : ControllerBase
     }
 
     /// <summary>
-    /// Get reservations for a venue.
+    ///     Get reservations for a venue.
     /// </summary>
     /// <param name="id">Venue Id</param>
     /// <returns></returns>

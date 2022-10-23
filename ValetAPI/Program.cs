@@ -1,27 +1,28 @@
+using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using ValetAPI.Data;
+using ValetAPI.Filters;
 using ValetAPI.Hubs;
 using ValetAPI.Models;
 using ValetAPI.Services;
 
 namespace ValetAPI;
+
 /// <summary>
-/// Entry to the program
+///     Entry to the program
 /// </summary>
 public static class Program
 {
     /// <summary>
-    /// Main
+    ///     Main
     /// </summary>
     /// <param name="args"></param>
     /// <exception cref="InvalidOperationException"></exception>
@@ -34,14 +35,12 @@ public static class Program
         // Add services to the container.
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        
-        
-        
+
+
         // builder.Services.AddDbContext<ApplicationDbContext>(options =>
         //     options.UseSqlServer(connectionString));
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                    options.UseSqlServer(connectionString));
-
+            options.UseSqlServer(connectionString));
 
 
         //
@@ -57,7 +56,7 @@ public static class Program
         builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
             .AddEntityFrameworkStores<ApplicationDbContext>();
         builder.Services.AddControllersWithViews();
-        
+
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -65,8 +64,15 @@ public static class Program
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             })
             .AddNewtonsoftJson()
-            .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+            .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore)
             .AddNewtonsoftJson(x => x.SerializerSettings.Converters.Add(new StringEnumConverter()));
+
+        builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<JsonExceptionFilter>();
+                options.Filters.Add<HttpResponseExceptionFilter>();
+            }
+            );
         
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
@@ -90,7 +96,6 @@ public static class Program
         });
 
         builder.Services.AddAutoMapper(options => options.AddProfile<MapperProfile>());
-
 
 
         builder.Services.AddCors(options =>
@@ -139,8 +144,7 @@ public static class Program
 
 
         app.UseHttpsRedirection();
-        
-        
+
 
         app.UseRouting();
 
@@ -150,14 +154,13 @@ public static class Program
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllerRoute(
-                name: "areas",
-                pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+                "areas",
+                "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
             endpoints.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                "default",
+                "{controller=Home}/{action=Index}/{id?}");
         });
-
 
 
         app.MapRazorPages();
@@ -168,10 +171,7 @@ public static class Program
             options.DefaultModelExpandDepth(-1);
             options.InjectStylesheet("/swagger-ui/SwaggerDark.css");
         });
-        app.UseSwagger(options =>
-        {
-            options.SerializeAsV2 = true;
-        });
+        app.UseSwagger(options => { options.SerializeAsV2 = true; });
 
         app.MapControllers();
 
@@ -189,15 +189,8 @@ internal class SwaggerSchemaFilter : ISchemaFilter
         const string prefix = "_";
         const string suffix = "Entity";
         foreach (var key in context.SchemaRepository.Schemas.Keys)
-        {
             if (key.EndsWith(suffix) || key.StartsWith(prefix))
-            {
                 keys.Add(key);
-            }
-        }
-        foreach (var key in keys)
-        {
-            context.SchemaRepository.Schemas.Remove(key);
-        }
+        foreach (var key in keys) context.SchemaRepository.Schemas.Remove(key);
     }
 }

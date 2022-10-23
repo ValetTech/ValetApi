@@ -28,9 +28,9 @@ public interface IReservationService
     Task<Reservation> GetReservationAsync(int reservationId);
 
     Task<int> CreateReservationAsync(Reservation reservation);
-    Task<bool> UpdateReservationAsync(Reservation reservation);
+    Task UpdateReservationAsync(Reservation reservation);
 
-    Task<bool> DeleteReservationAsync(int reservationId);
+    Task DeleteReservationAsync(int reservationId);
     Task<IEnumerable<Table>> GetReservationTables(int reservationId);
 
     Task<bool> AddTableToReservation(int reservationId, int tableId);

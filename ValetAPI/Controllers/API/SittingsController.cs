@@ -1,69 +1,122 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using ValetAPI.Data;
-using ValetAPI.Infrastructure;
 using ValetAPI.Models;
+using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
 
 namespace ValetAPI.Controllers.API;
 
 /// <summary>
-/// Sittings controller
+///     Sittings controller
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class SittingsController : ControllerBase
 {
     private readonly ISittingService _sittingService;
+    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
 
     /// <summary>
-    /// Sittings constructor
+    ///     Sittings constructor
     /// </summary>
     /// <param name="sittingService"></param>
-    public SittingsController(ISittingService sittingService)
+    public SittingsController(ISittingService sittingService, AutoMapper.IConfigurationProvider mappingConfiguration)
     {
         _sittingService = sittingService;
+        _mappingConfiguration = mappingConfiguration;
     }
 
     /// <summary>
-    /// Get all sittings.
+    ///     Get all sittings.
     /// </summary>
     /// <returns></returns>
     [HttpGet("", Name = nameof(GetSittings))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Sitting>>> GetSittings([FromQuery] SittingQueryParameters queryParameters)
+    public async Task<ActionResult<IEnumerable<Sitting>>> GetSittings(
+        [FromQuery] SittingQueryParameters queryParameters)
     {
         var sittings = _sittingService.GetSittingsAsync();
 
-        if (queryParameters.Date != null)
+        if (queryParameters.Date.HasValue)
         {
             var date = queryParameters.Date.Value.Date;
             sittings = sittings.Where(s => date <= s.EndTime.Date && date >= s.StartTime.Date);
         }
 
-        if (queryParameters.DateTime != null)
+        if (queryParameters.MinDateTime.HasValue)
         {
-            var dateTime = queryParameters.DateTime.Value;
+            var dateTime = queryParameters.MinDateTime.Value;
+            sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
+        }
+        
+        if (queryParameters.MaxDateTime.HasValue)
+        {
+            var dateTime = queryParameters.MaxDateTime.Value;
             sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
         }
 
-        if (queryParameters.Type != null)
+        if (queryParameters.Capacity.HasValue)
+        {
+            var capacity = queryParameters.Capacity.Value;
+            sittings = sittings.Where(s => s.Capacity == capacity);
+        }
+
+        if (queryParameters.Type.HasValue)
         {
             var type = queryParameters.Type.Value;
             sittings = sittings.Where(s => s.Type == type);
         }
         
-        if (sittings == null) return NotFound();
-        if (!sittings.Any()) return NoContent();
-        return Ok(await sittings.ToArrayAsync());
+        if (queryParameters.hasReservations.HasValue)
+        {
+            var hasReservations = queryParameters.hasReservations.Value;
+            sittings = sittings.Where(s => s.Reservations.Any() == hasReservations);
+        }
+        
+        if (queryParameters.hasAreas.HasValue)
+        {
+            var hasAreas = queryParameters.hasAreas.Value;
+            sittings = sittings.Where(s => s.Areas.Any() == hasAreas);
+        }
+        
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        {
+            sittings = sittings.Where(a => true
+            );
+        }
+        
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            if (typeof(Sitting).GetProperty(queryParameters.SortBy) != null)
+            {
+                sittings = sittings.OrderByCustom(
+                    queryParameters.SortBy,
+                    queryParameters.SortOrder);
+            }
+        }
+        
+        sittings = sittings
+            .Skip(queryParameters.Size * (queryParameters.Page - 1))
+            .Take(queryParameters.Size);
+        
+        var mapper = _mappingConfiguration.CreateMapper();
+        var sittingsDto = sittings.Select(s => new {
+            s.Id,
+            s.Capacity,
+            s.Type,
+            s.StartTime,
+            s.EndTime,
+            Areas = mapper.Map<Models.DTO.Area[]>(s.Areas),
+            Reservations = mapper.Map<Models.DTO.Reservation[]>(s.Reservations)
+        });
+
+        return Ok(new { sittings = await sittingsDto.ToArrayAsync() });
     }
 
-    
+
     /// <summary>
-    /// Get sitting by Id.
+    ///     Get sitting by Id.
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <returns></returns>
@@ -76,9 +129,9 @@ public class SittingsController : ControllerBase
         if (sitting == null) return NotFound();
         return Ok(sitting);
     }
-    
+
     /// <summary>
-    /// Create a new Sitting.
+    ///     Create a new Sitting.
     /// </summary>
     /// <param name="sitting">Sitting Object</param>
     /// <returns>Newly created sitting</returns>
@@ -87,13 +140,16 @@ public class SittingsController : ControllerBase
     [ProducesResponseType(201)]
     public async Task<ActionResult<Sitting>> CreateSitting(Sitting sitting)
     {
-        var sittingId = await _sittingService.CreateSittingAsync(sitting);
-        var sittingEntity = await _sittingService.GetSittingAsync(sittingId);
-        return Created($"api/sitting/{sittingId}", sittingEntity);
+        var id = await _sittingService.CreateSittingAsync(sitting);
+        
+        var entity = await _sittingService.GetSittingAsync(id);
+        if (entity == null) return BadRequest();
+        
+        return CreatedAtAction($"GetSitting",new { id = entity.Id }, entity);
     }
 
     /// <summary>
-    /// Update sitting.
+    ///     Update sitting.
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <param name="sitting">Sitting Object</param>
@@ -111,7 +167,7 @@ public class SittingsController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a sitting.
+    ///     Delete a sitting.
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <returns></returns>
@@ -126,7 +182,7 @@ public class SittingsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all reservations for a sitting.
+    ///     Get all reservations for a sitting.
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <returns></returns>
@@ -141,7 +197,7 @@ public class SittingsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all areas for a sitting.
+    ///     Get all areas for a sitting.
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <returns></returns>
@@ -156,7 +212,7 @@ public class SittingsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all sitting types
+    ///     Get all sitting types
     /// </summary>
     /// <param name="date"></param>
     /// <returns></returns>
@@ -170,8 +226,8 @@ public class SittingsController : ControllerBase
         if (date != null)
         {
             var sittings = _sittingService.GetSittingsAsync();
-            types = await sittings.Where(s=>date>=s.StartTime.Date && date<=s.EndTime.Date).Select(s => s.Type.ToString()).Distinct().ToArrayAsync();
-
+            types = await sittings.Where(s => date >= s.StartTime.Date && date <= s.EndTime.Date)
+                .Select(s => s.Type.ToString()).Distinct().ToArrayAsync();
         }
 
         if (types.Length == 0) return NoContent();
@@ -180,7 +236,7 @@ public class SittingsController : ControllerBase
     }
 
     /// <summary>
-    /// Get all tables for a sitting.
+    ///     Get all tables for a sitting.
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <param name="queryParameters"></param>
@@ -188,23 +244,18 @@ public class SittingsController : ControllerBase
     [HttpGet("{id:int}/tables", Name = nameof(GetSittingTables))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Table>>> GetSittingTables(int id, [FromQuery] SittingTableQueryParameters queryParameters)
+    public async Task<ActionResult<IEnumerable<Table>>> GetSittingTables(int id,
+        [FromQuery] SittingTableQueryParameters queryParameters)
     {
         var tables = await _sittingService.GetTablesAsync(id);
 
         var available = queryParameters.Available;
         var taken = queryParameters.Taken;
-        if (available && !taken)
-        {
-            tables = await _sittingService.GetAvailableTablesAsync(id);
-        }
-        if (taken && !available)
-        {
-            tables = await _sittingService.GetTakenTablesAsync(id);
-        }
+        if (available && !taken) tables = await _sittingService.GetAvailableTablesAsync(id);
+        if (taken && !available) tables = await _sittingService.GetTakenTablesAsync(id);
 
         if (tables == null) return NotFound();
-        
+
         tables = tables
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
             .Take(queryParameters.Size);
@@ -214,7 +265,7 @@ public class SittingsController : ControllerBase
 
 
     /// <summary>
-    /// Add Areas to Sitting
+    ///     Add Areas to Sitting
     /// </summary>
     /// <param name="id">Sitting Id</param>
     /// <param name="areas">List of area Ids</param>
@@ -224,10 +275,7 @@ public class SittingsController : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<Sitting>> AddAreasToSitting(int id, [FromBody] List<int> areas)
     {
-        
         var sitting = await _sittingService.AddAreasToSitting(id, areas);
         return Ok(sitting);
     }
-
 }
-

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Data;
@@ -28,9 +27,9 @@ public class DefaultSittingService : ISittingService
     {
         if (_context.Sittings == null) return null;
         return _context.Sittings
-            .Include(s=>s.Reservations)
-            .Include(s=>s.AreaSittings)
-            .ThenInclude(sa=>sa.Area)
+            .Include(s => s.Reservations)
+            .Include(s => s.AreaSittings)
+            .ThenInclude(sa => sa.Area)
             .ProjectTo<Sitting>(_mappingConfiguration).AsQueryable();
     }
 
@@ -39,9 +38,9 @@ public class DefaultSittingService : ISittingService
         if (_context.Sittings == null) return null;
 
         var sitting = await _context.Sittings
-            .Include(s=>s.AreaSittings)
-            .ThenInclude(s=>s.Area)
-            .Include(s=>s.Reservations)
+            .Include(s => s.AreaSittings)
+            .ThenInclude(s => s.Area)
+            .Include(s => s.Reservations)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
         if (sitting == null) return null;
@@ -56,9 +55,9 @@ public class DefaultSittingService : ISittingService
         if (_context.Sittings == null) return null;
 
         var sitting = await _context.Sittings
-            .Include(s=>s.AreaSittings)
-            .ThenInclude(s=>s.Area)
-            .Include(s=>s.Reservations)
+            .Include(s => s.AreaSittings)
+            .ThenInclude(s => s.Area)
+            .Include(s => s.Reservations)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
         if (sitting == null) return null;
@@ -100,7 +99,6 @@ public class DefaultSittingService : ISittingService
         _context.Entry(entity).CurrentValues.SetValues(mapper.Map<SittingEntity>(sitting));
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not update sitting.");
-
     }
 
     public async Task<IEnumerable<Reservation>> GetReservationsAsync(int sittingId)
@@ -142,13 +140,12 @@ public class DefaultSittingService : ISittingService
         if (_context.Sittings == null) return null;
 
         var sitting = await _context.Sittings
-            .Include(s=>s.AreaSittings)
+            .Include(s => s.AreaSittings)
             .ThenInclude(a => a.Area)
-            .ThenInclude(a=> a.Tables)
+            .ThenInclude(a => a.Tables)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
-        
-        
-        
+
+
         if (sitting == null) return null;
 
         var tables = sitting!.AreaSittings
@@ -158,7 +155,6 @@ public class DefaultSittingService : ISittingService
             .AsQueryable();
 
         return tables.ProjectTo<Table>(_mappingConfiguration);
-
     }
 
     public async Task<IQueryable<Table>> GetAvailableTablesAsync(int sittingId)
@@ -171,7 +167,8 @@ public class DefaultSittingService : ISittingService
             .Include(s => s.AreaSittings)
             .ThenInclude(a => a.Area)
             .ThenInclude(a => a.Tables)
-            .SingleOrDefaultAsync(a => a.Id == sittingId); ;
+            .SingleOrDefaultAsync(a => a.Id == sittingId);
+        ;
 
         if (sitting == null) return null;
 
@@ -188,7 +185,6 @@ public class DefaultSittingService : ISittingService
         var tables = allTables.Where(t => !takenTables.Contains(t));
 
         return tables?.ProjectTo<Table>(_mappingConfiguration);
-
     }
 
     public async Task<IQueryable<Table>> GetTakenTablesAsync(int sittingId)
@@ -196,8 +192,8 @@ public class DefaultSittingService : ISittingService
         if (_context.Sittings == null) return null;
 
         var sitting = await _context.Sittings
-            .Include(s=>s.Reservations)
-            .ThenInclude(r=>r.Tables)
+            .Include(s => s.Reservations)
+            .ThenInclude(r => r.Tables)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
         if (sitting == null) return null;
@@ -214,24 +210,19 @@ public class DefaultSittingService : ISittingService
         if (_context.Sittings == null) return null;
 
         var sitting = await _context.Sittings
-            .Include(s=>s.AreaSittings)
-            .ThenInclude(sa=>sa.Area)
-            .Include(s=>s.Reservations)
+            .Include(s => s.AreaSittings)
+            .ThenInclude(sa => sa.Area)
+            .Include(s => s.Reservations)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
-        sitting.AreaSittings.AddRange(areas.Select((id) => new AreaSittingEntity{AreaId = id, SittingId = sitting.Id}));
-        
+        sitting.AreaSittings.AddRange(areas.Select(id => new AreaSittingEntity {AreaId = id, SittingId = sitting.Id}));
+
         if (sitting == null) return null;
 
         await _context.SaveChangesAsync();
 
         var mapper = _mappingConfiguration.CreateMapper();
-        
+
         return mapper.Map<Sitting>(sitting);
     }
-    
-
-
-
-    
 }

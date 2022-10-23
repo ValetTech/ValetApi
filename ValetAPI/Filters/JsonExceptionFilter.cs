@@ -2,36 +2,35 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using ValetAPI.Models;
 
-namespace ValetAPI.Filters
+namespace ValetAPI.Filters;
+
+public class JsonExceptionFilter : IExceptionFilter
 {
-    public class JsonExceptionFilter : IExceptionFilter
+    private readonly IWebHostEnvironment _env;
+
+    public JsonExceptionFilter(IWebHostEnvironment env)
     {
-        private readonly IWebHostEnvironment _env;
+        _env = env;
+    }
 
-        public JsonExceptionFilter(IWebHostEnvironment env)
+    public void OnException(ExceptionContext context)
+    {
+        var error = new ApiError();
+
+        if (_env.IsDevelopment())
         {
-            _env = env;
+            error.Message = context.Exception.Message;
+            error.Detail = context.Exception.StackTrace;
+        }
+        else
+        {
+            error.Message = "A server error occurred.";
+            error.Detail = context.Exception.Message;
         }
 
-        public void OnException(ExceptionContext context)
+        context.Result = new ObjectResult(error)
         {
-            var error = new ApiError();
-
-            if (_env.IsDevelopment())
-            {
-                error.Message = context.Exception.Message;
-                error.Detail = context.Exception.StackTrace;
-            }
-            else
-            {
-                error.Message = "A server error occurred.";
-                error.Detail = context.Exception.Message;
-            }
-
-            context.Result = new ObjectResult(error)
-            {
-                StatusCode = 500
-            };
-        }
+            StatusCode = 500
+        };
     }
 }

@@ -2,6 +2,8 @@
 
 public enum Source
 {
-    Website, InPerson, Email, Phone
+    Website,
+    InPerson,
+    Email,
+    Phone
 }
-

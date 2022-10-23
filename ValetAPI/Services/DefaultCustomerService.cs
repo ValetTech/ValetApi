@@ -1,7 +1,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using ValetAPI.Data;
+using ValetAPI.Filters;
 using ValetAPI.Models;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
@@ -24,10 +24,11 @@ public class DefaultCustomerService : ICustomerService
         return await _context.Customers.ToArrayAsync();
     }
 
-    public async Task<IEnumerable<Customer>> GetCustomersAsync()
+    public async Task<IQueryable<Customer>> GetCustomersAsync()
     {
-        if (_context.Customers == null) return null;
-        return await _context.Customers.ProjectTo<Customer>(_mappingConfiguration).ToArrayAsync();
+        if (_context.Customers == null) 
+            throw new HttpResponseException(404, "Customers not found.");
+        return _context.Customers.AsQueryable().ProjectTo<Customer>(_mappingConfiguration);
     }
 
     public async Task<Customer> GetCustomerAsync(int customerId)
@@ -71,7 +72,6 @@ public class DefaultCustomerService : ICustomerService
         if (created < 1) throw new InvalidOperationException("Could not create customer.");
 
         return entity.Entity;
-
     }
 
     public async Task DeleteCustomerAsync(int customerId)
@@ -97,7 +97,6 @@ public class DefaultCustomerService : ICustomerService
 
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not update customer.");
-
     }
 
     public async Task<IEnumerable<Reservation>> GetReservationsAsync(int customerId)

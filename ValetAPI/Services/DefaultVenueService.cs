@@ -9,7 +9,7 @@ namespace ValetAPI.Services;
 public class DefaultVenueService : IVenueService
 {
     private readonly ApplicationDbContext _context;
-    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
+    private readonly IConfigurationProvider _mappingConfiguration;
 
     public DefaultVenueService(ApplicationDbContext context, IConfigurationProvider mappingConfiguration)
     {
@@ -29,12 +29,12 @@ public class DefaultVenueService : IVenueService
 
         var venue = await _context.Venues
             // .ProjectTo<Venue>(_mappingConfiguration)
-            .SingleOrDefaultAsync(v=>v.Id == venueId);
+            .SingleOrDefaultAsync(v => v.Id == venueId);
 
         if (venue == null) return null;
 
         var mapper = _mappingConfiguration.CreateMapper();
-        
+
         return mapper.Map<Venue>(venue);
     }
 
@@ -64,9 +64,9 @@ public class DefaultVenueService : IVenueService
     {
         var mapper = _mappingConfiguration.CreateMapper();
 
-        var entity = await _context.Venues.FirstOrDefaultAsync(v=>v.Id == venue.Id);
+        var entity = await _context.Venues.FirstOrDefaultAsync(v => v.Id == venue.Id);
         if (entity == null) return;
-        
+
         // vEntity = entity;
 
         _context.Entry(entity).CurrentValues.SetValues(mapper.Map<VenueEntity>(venue));
@@ -76,7 +76,6 @@ public class DefaultVenueService : IVenueService
         // _context.Entry(entity).State = EntityState.Modified;
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not update venue.");
-
     }
 
     public async Task<IEnumerable<Area>> GetAreasAsync(int venueId)
@@ -84,7 +83,7 @@ public class DefaultVenueService : IVenueService
         if (_context.Venues == null) return null;
 
         var venue = await _context.Venues
-            .Include(v=>v.Areas)
+            .Include(v => v.Areas)
             .SingleOrDefaultAsync(v => v.Id == venueId);
 
         if (venue?.Areas == null) return null;
@@ -134,15 +133,14 @@ public class DefaultVenueService : IVenueService
         throw new NotImplementedException();
 
         var mapper = _mappingConfiguration.CreateMapper();
-        
-        var venueEntity = await _context.Venues.Include(v=>v.Areas).FirstOrDefaultAsync(v=>v.Id == venueId);
+
+        var venueEntity = await _context.Venues.Include(v => v.Areas).FirstOrDefaultAsync(v => v.Id == venueId);
         if (venueEntity == null) return null;
-        
+
         var venue = mapper.Map<Venue>(venueEntity);
         venue.Areas.Add(area);
         return venue.Areas;
         throw new NotImplementedException();
-
     }
 
     // public async Task<IEnumerable<T>> AddAsync<T>(int venueId, T source)
@@ -162,7 +160,6 @@ public class DefaultVenueService : IVenueService
     public async Task<IEnumerable<Sitting>> AddSittingsAsync(int venueId, Sitting sitting)
     {
         throw new NotImplementedException();
-
     }
 
     public async Task<IEnumerable<Reservation>> AddReservationsAsync(int venueId, Reservation reservation)

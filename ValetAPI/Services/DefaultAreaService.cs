@@ -1,6 +1,9 @@
-﻿using AutoMapper.QueryableExtensions;
+﻿using System.Net;
+using System.Text.Json;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Data;
+using ValetAPI.Filters;
 using ValetAPI.Models;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
@@ -22,22 +25,21 @@ public class DefaultAreaService : IAreaService
     {
         if (_context.Areas == null) return null;
         return _context.Areas
-            .Include(a=>a.AreaSittings)
-            .ThenInclude(sa=>sa.Sitting)
-            .Include(a=>a.Tables)
+            .Include(a => a.AreaSittings)
+            .ThenInclude(sa => sa.Sitting)
+            .Include(a => a.Tables)
             .ProjectTo<Area>(_mappingConfiguration).AsQueryable();
     }
 
     public async Task<Area> GetAreaAsync(int areaId)
     {
-        if (_context.Areas == null) return null;
 
         var area = await _context.Areas
             // .ProjectTo<Venue>(_mappingConfiguration)
-            .Include(a=>a.Tables)
+            .Include(a => a.Tables)
             .SingleOrDefaultAsync(a => a.Id == areaId);
 
-        if (area == null) return null;
+        if (area == null) throw new HttpResponseException(404, "Area not found.");
 
         var mapper = _mappingConfiguration.CreateMapper();
 
@@ -48,7 +50,6 @@ public class DefaultAreaService : IAreaService
     {
         var mapper = _mappingConfiguration.CreateMapper();
 
-        
 
         var entity = await _context.Areas.AddAsync(mapper.Map<AreaEntity>(area));
         var created = await _context.SaveChangesAsync();
@@ -63,7 +64,7 @@ public class DefaultAreaService : IAreaService
         var area = await _context.Areas
             .SingleOrDefaultAsync(a => a.Id == areaId);
 
-        if (area == null) return;
+        if (area == null) throw new HttpResponseException(404, "Area not found.");
 
         _context.Areas.Remove(area);
         await _context.SaveChangesAsync();
@@ -74,7 +75,7 @@ public class DefaultAreaService : IAreaService
         var mapper = _mappingConfiguration.CreateMapper();
 
         var entity = await _context.Areas.FirstOrDefaultAsync(v => v.Id == area.Id);
-        if (entity == null) return;
+        if (entity == null) throw new HttpResponseException(404, "Area not found.");
 
         // vEntity = entity;
 
@@ -84,8 +85,9 @@ public class DefaultAreaService : IAreaService
         // var newVenue = _context.Update(entity);
         // _context.Entry(entity).State = EntityState.Modified;
         var created = await _context.SaveChangesAsync();
-        if (created < 1) throw new InvalidOperationException("Could not update area.");
-
+        // throw new HttpRequestException("Not Modified", HttpStatusCode.NotModified);
+        if (created < 1) throw new HttpResponseException(400, "Could not update area.");
+        // if (created < 1) throw new InvalidOperationException("Could not update area.");
     }
 
     public async Task<IEnumerable<Table>> GetTablesAsync(int areaId)

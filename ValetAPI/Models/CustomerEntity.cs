@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Xml.Linq;
 
 namespace ValetAPI.Models;
 
@@ -11,7 +10,8 @@ public class CustomerEntity
     public string LastName { get; set; }
     public string Email { get; set; }
     public string? Phone { get; set; }
-    public List<ReservationEntity> Reservations { get; set; } = new List<ReservationEntity>();
+    public List<ReservationEntity> Reservations { get; set; } = new();
+
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     [Display(Name = "Name")]
     public string FullName => FirstName + " " + LastName;

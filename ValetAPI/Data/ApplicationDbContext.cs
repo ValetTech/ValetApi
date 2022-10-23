@@ -6,6 +6,11 @@ namespace ValetAPI.Data;
 
 public class ApplicationDbContext : IdentityDbContext
 {
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
+    {
+    }
+
     public DbSet<VenueEntity> Venues { get; set; }
     public DbSet<AreaEntity> Areas { get; set; }
     public DbSet<TableEntity> Tables { get; set; }
@@ -17,58 +22,51 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<StateEntity> States { get; set; }
     public DbSet<SourceEntity> Sources { get; set; }
 
-
-    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-        : base(options)
-    {
-    }
-
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
 
         mb.Seed();
-        
-        
 
-        mb.Entity<SittingEntity>().Property(s=>s.Type).HasConversion<string>().IsRequired();
-        mb.Entity<ReservationEntity>().Property(r=>r.Source).HasConversion<string>().IsRequired();
-        mb.Entity<ReservationEntity>().Property(r=> r.Status).HasConversion<string>().IsRequired();
-        
-            
+
+        mb.Entity<SittingEntity>().Property(s => s.Type).HasConversion<string>().IsRequired();
+        mb.Entity<ReservationEntity>().Property(r => r.Source).HasConversion<string>().IsRequired();
+        mb.Entity<ReservationEntity>().Property(r => r.Status).HasConversion<string>().IsRequired();
+
+
         mb
             .Entity<SittingTypeEntity>().HasData(
                 Enum.GetValues(typeof(SittingType))
                     .Cast<SittingType>()
-                    .Select(e => new SittingTypeEntity()
+                    .Select(e => new SittingTypeEntity
                     {
                         Id = e,
                         Type = e.ToString()
                     })
             );
-        
+
         mb
             .Entity<StateEntity>().HasData(
                 Enum.GetValues(typeof(State))
                     .Cast<State>()
-                    .Select(e => new StateEntity()
+                    .Select(e => new StateEntity
                     {
                         Id = e,
                         State = e.ToString()
                     })
             );
-        
+
         mb
             .Entity<SourceEntity>().HasData(
                 Enum.GetValues(typeof(Source))
                     .Cast<Source>()
-                    .Select(e => new SourceEntity()
+                    .Select(e => new SourceEntity
                     {
                         Id = e,
                         Source = e.ToString()
                     })
             );
-    
+
         // Enum.GetValues(typeof(SittingType)).Cast<int>().Select(p => new { id = p,name=((SittingType)p).ToString() });
         // mb.Entity<SittingTypeEntity>().HasData(Enum.GetNames(typeof(SittingType)));
         // Enum
@@ -88,7 +86,7 @@ public class ApplicationDbContext : IdentityDbContext
             .OnDelete(DeleteBehavior.Restrict);
 
         mb.Entity<AreaSittingEntity>()
-            .HasKey(a => new { a.AreaId, a.SittingId });
+            .HasKey(a => new {a.AreaId, a.SittingId});
         mb.Entity<AreaSittingEntity>()
             .HasOne(bc => bc.Area)
             .WithMany(b => b.AreaSittings)
@@ -118,7 +116,5 @@ public class ApplicationDbContext : IdentityDbContext
             .HasOne(k => k.Area)
             .WithMany(c => c.Tables)
             .OnDelete(DeleteBehavior.Restrict);
-
     }
-
 }

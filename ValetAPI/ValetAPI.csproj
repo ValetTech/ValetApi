@@ -13,8 +13,6 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.2.1" />
     <PackageReference Include="JsonSchema.Net" Version="3.2.1" />
-    <PackageReference Include="JsonSchema.Net.Generation" Version="3.0.3" />
-    <PackageReference Include="JsonSchema.Net.OpenApi" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.8" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
@@ -896,6 +894,10 @@
     <_ContentIncludedByDefault Remove="wwwroot\swagger\favicon-16x16.png" />
     <_ContentIncludedByDefault Remove="wwwroot\swagger\favicon-32x32.png" />
     <_ContentIncludedByDefault Remove="wwwroot\swagger\logo.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\favicon-16x16.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\favicon-32x32.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\swagger-ui\logo.png" />
+    <_ContentIncludedByDefault Remove="wwwroot\swagger-ui\SwaggerDark.css" />
   </ItemGroup>
 
   <ItemGroup>
@@ -903,11 +905,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Infrastructure\IQueryableExtensions.cs" />
-    <Compile Include="Infrastructure\QueryParameters.cs" />
-    <Compile Include="Infrastructure\ReservationQueryParameters.cs" />
-    <Compile Include="Infrastructure\SittingQueryParameters.cs" />
-    <Compile Include="Infrastructure\SittingTableQueryParameters.cs" />
+    <Compile Include="QueryParameters\IQueryableExtensions.cs" />
+    <Compile Include="QueryParameters\QueryParameters.cs" />
+    <Compile Include="QueryParameters\ReservationQueryParameters.cs" />
+    <Compile Include="QueryParameters\SittingQueryParameters.cs" />
+    <Compile Include="QueryParameters\SittingTableQueryParameters.cs" />
+    <Compile Remove="QueryParameters\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="QueryParameters\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="QueryParameters\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="QueryParameters\**" />
   </ItemGroup>
 
 </Project>

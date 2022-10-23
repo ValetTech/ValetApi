@@ -1,4 +1,4 @@
-﻿namespace ValetAPI.Infrastructure;
+﻿namespace ValetAPI.Models.QueryParameters;
 
 /// <summary>
 /// </summary>
@@ -6,6 +6,8 @@ public class QueryParameters
 {
     private const int _maxSize = 100;
     private int _size = 50;
+
+    private string _sortOrder = "asc";
 
     public int Page { get; set; } = 1;
 
@@ -17,16 +19,15 @@ public class QueryParameters
 
     public string SortBy { get; set; } = "Id";
 
-    private string _sortOrder = "asc";
     public string SortOrder
     {
         get => _sortOrder;
-        
-        set {
-        if (value is "asc" or "desc")
+
+        set
         {
-            _sortOrder = value;
-        }
+            if (value is "asc" or "desc") _sortOrder = value;
         }
     }
+
+    public string SearchTerm { get; set; } = string.Empty;
 }

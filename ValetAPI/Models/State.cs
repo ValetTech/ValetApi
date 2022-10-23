@@ -2,5 +2,10 @@
 
 public enum State
 {
-    Pending, Confirmed, Cancelled, Assigned, Seated, Completed
+    Pending,
+    Confirmed,
+    Cancelled,
+    Assigned,
+    Seated,
+    Completed
 }

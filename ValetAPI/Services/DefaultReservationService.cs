@@ -1,9 +1,7 @@
-﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
+﻿using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Runtime.InteropServices;
 using ValetAPI.Data;
+using ValetAPI.Filters;
 using ValetAPI.Models;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
@@ -11,7 +9,6 @@ namespace ValetAPI.Services;
 
 public class DefaultReservationService : IReservationService
 {
-
     // GetReservation // By Id
     // GetReservations
     // PostReservation
@@ -30,11 +27,12 @@ public class DefaultReservationService : IReservationService
     // VenueId = Sitting.VenueId
 
     private readonly ApplicationDbContext _context;
-    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
     private readonly ICustomerService _customerService;
+    private readonly IConfigurationProvider _mappingConfiguration;
     private readonly ISittingService _sittingService;
 
-    public DefaultReservationService(ApplicationDbContext context, IConfigurationProvider mappingConfiguration, ICustomerService customerService, ISittingService sittingService)
+    public DefaultReservationService(ApplicationDbContext context, IConfigurationProvider mappingConfiguration,
+        ICustomerService customerService, ISittingService sittingService)
     {
         _context = context;
         _mappingConfiguration = mappingConfiguration;
@@ -65,18 +63,18 @@ public class DefaultReservationService : IReservationService
             // .Include(r => r.Sitting)
             // .Include(r => r.Venue)
             .AsQueryable();
-            // .Include(r=>r.)
-            // .Select(r=> new
-            // {
-            //     r.Id,
-            //     r.VenueId,
-            //     r.DateTime,
-            //     r.Duration,
-            //     r.
-            //     Customer = r.Customer.,
-            //
-            // })
-            // return _context.Reservations.FromSqlInterpolated($"SELECT * FROM reservations").AsQueryable().ProjectTo<Reservation>(_mappingConfiguration);
+        // .Include(r=>r.)
+        // .Select(r=> new
+        // {
+        //     r.Id,
+        //     r.VenueId,
+        //     r.DateTime,
+        //     r.Duration,
+        //     r.
+        //     Customer = r.Customer.,
+        //
+        // })
+        // return _context.Reservations.FromSqlInterpolated($"SELECT * FROM reservations").AsQueryable().ProjectTo<Reservation>(_mappingConfiguration);
 
         return reservations.ProjectTo<Reservation>(_mappingConfiguration);
         // return await _context.Reservations.ProjectTo<Reservation>(_mappingConfiguration).ToListAsync();
@@ -85,14 +83,13 @@ public class DefaultReservationService : IReservationService
     // Get Reservation by id
     public async Task<Reservation> GetReservationAsync(int reservationId)
     {
-
         if (_context.Reservations == null) return null;
         var reservation = await _context.Reservations
             .Include(r => r.Customer)
             .Include(r => r.Tables)
             .Include(r => r.Sitting)
             .Include(r => r.Venue)
-            .FirstOrDefaultAsync(r=>r.Id==reservationId);
+            .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         if (reservation == null) return null;
 
@@ -108,7 +105,8 @@ public class DefaultReservationService : IReservationService
         var reservationEntity = mapper.Map<ReservationEntity>(reservation);
 
 
-        var customer = await _customerService.GetOrCreateCustomerEntityAsync(reservation.CustomerId, reservation.Customer);
+        var customer =
+            await _customerService.GetOrCreateCustomerEntityAsync(reservation.CustomerId, reservation.Customer);
         var sitting = await _sittingService.GetSittingEntityAsync(reservation.SittingId);
         var venueId = sitting.VenueId;
 
@@ -136,7 +134,7 @@ public class DefaultReservationService : IReservationService
     }
 
 
-    public async Task<bool> UpdateReservationAsync(Reservation reservation)
+    public async Task UpdateReservationAsync(Reservation reservation)
     {
         var mapper = _mappingConfiguration.CreateMapper();
 
@@ -148,27 +146,24 @@ public class DefaultReservationService : IReservationService
         }
         catch (DbUpdateConcurrencyException)
         {
-            return false;
+            throw new HttpResponseException(400, "Could not update reservation.");
         }
-
-        return true;
     }
 
-    public async Task<bool> DeleteReservationAsync(int reservationId)
+    public async Task DeleteReservationAsync(int reservationId)
     {
-        if (_context.Reservations == null) return false;
         var reservation = await _context.Reservations.FindAsync(reservationId);
-        if (reservation == null) return false;
+        if (reservation == null) throw new HttpResponseException(404, "Reservation not found.");
 
         _context.Reservations.Remove(reservation);
         await _context.SaveChangesAsync();
-        return true;
     }
 
     public async Task<IEnumerable<Table>> GetReservationTables(int reservationId)
     {
         if (_context.Reservations == null) return null;
-        var reservationEntity = await _context.Reservations.Include(r=>r.Tables).FirstOrDefaultAsync(r=>r.Id==reservationId);
+        var reservationEntity = await _context.Reservations.Include(r => r.Tables)
+            .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         if (reservationEntity?.Tables == null) return null;
 
@@ -181,8 +176,8 @@ public class DefaultReservationService : IReservationService
     {
         if (_context.Reservations == null) return false;
         var reservationEntity = await _context.Reservations
-            .Include(r=>r.Sitting)
-            .FirstOrDefaultAsync(r=>r.Id == reservationId);
+            .Include(r => r.Sitting)
+            .FirstOrDefaultAsync(r => r.Id == reservationId);
 
 
         var tables = await GetAvailableTableEntitiesForSittingAsync(reservationEntity.Sitting.Id);
@@ -200,9 +195,9 @@ public class DefaultReservationService : IReservationService
     {
         if (_context.Reservations == null) return false;
         var reservationEntity = await _context.Reservations
-            .Include(r=>r.Tables)
-            .Include(r=>r.Sitting)
-            .FirstOrDefaultAsync(r=>r.Id == reservationId);
+            .Include(r => r.Tables)
+            .Include(r => r.Sitting)
+            .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         if (reservationEntity == null) return false;
 
@@ -239,8 +234,8 @@ public class DefaultReservationService : IReservationService
         if (_context.Reservations == null) return false;
 
         var reservationEntity = await _context.Reservations
-            .Include(r=>r.Tables)
-            .FirstOrDefaultAsync(r=>r.Id == reservationId);
+            .Include(r => r.Tables)
+            .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         var tableEntity = await _context.Tables
             .Where(t => tableIds.Contains(t.Id))
@@ -264,7 +259,8 @@ public class DefaultReservationService : IReservationService
             .Include(s => s.AreaSittings)
             .ThenInclude(a => a.Area)
             .ThenInclude(a => a.Tables)
-            .SingleOrDefaultAsync(a => a.Id == sittingId); ;
+            .SingleOrDefaultAsync(a => a.Id == sittingId);
+        ;
 
         if (sitting == null) return null;
 
@@ -280,6 +276,5 @@ public class DefaultReservationService : IReservationService
             .AsQueryable();
 
         return tables;
-
     }
 }

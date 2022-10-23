@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ValetAPI.Data;
 using ValetAPI.Models;
 using ValetAPI.Services;
 
 namespace ValetAPI.Controllers.API;
 
 /// <summary>
-/// Tables controller
+///     Tables controller
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
@@ -16,7 +14,7 @@ public class TablesController : ControllerBase
     private readonly ITableService _tableService;
 
     /// <summary>
-    /// Tables controller
+    ///     Tables controller
     /// </summary>
     /// <param name="tableService"></param>
     public TablesController(ITableService tableService)
@@ -25,7 +23,7 @@ public class TablesController : ControllerBase
     }
 
     /// <summary>
-    /// Get all tables.
+    ///     Get all tables.
     /// </summary>
     /// <returns>All tables</returns>
     [HttpGet("", Name = nameof(GetTables))]
@@ -39,7 +37,7 @@ public class TablesController : ControllerBase
     }
 
     /// <summary>
-    /// Get table by Id.
+    ///     Get table by Id.
     /// </summary>
     /// <param name="id">Table Id</param>
     /// <returns></returns>
@@ -54,7 +52,7 @@ public class TablesController : ControllerBase
     }
 
     /// <summary>
-    /// Update table.
+    ///     Update table.
     /// </summary>
     /// <param name="id">Table Id</param>
     /// <param name="table">Table Object</param>
@@ -72,7 +70,7 @@ public class TablesController : ControllerBase
     }
 
     /// <summary>
-    /// Create new table.
+    ///     Create new table.
     /// </summary>
     /// <param name="table">Table Object</param>
     /// <returns></returns>
@@ -81,14 +79,13 @@ public class TablesController : ControllerBase
     [ProducesResponseType(201)]
     public async Task<ActionResult<Table>> CreateTable(Table table)
     {
-
         var tableId = await _tableService.CreateTableAsync(table);
         var tableEntity = await _tableService.GetTableAsync(tableId);
         return Created($"api/table/{tableId}", tableEntity);
     }
 
     /// <summary>
-    /// Delete table.
+    ///     Delete table.
     /// </summary>
     /// <param name="id">Table Id</param>
     /// <returns></returns>
@@ -101,5 +98,4 @@ public class TablesController : ControllerBase
 
         return NoContent();
     }
-
 }

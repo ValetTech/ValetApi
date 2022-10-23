@@ -19,12 +19,16 @@ public interface ISittingService
 
     // Get all Sittings
     IQueryable<Sitting> GetSittingsAsync();
+
     // Get Sitting by Id
     Task<Sitting> GetSittingAsync(int sittingId);
+
     // Create Sitting
     Task<int> CreateSittingAsync(Sitting sitting);
+
     // Delete Sitting by Id
     Task DeleteSittingAsync(int sittingId);
+
     // Update Sitting 
     Task UpdateSittingAsync(Sitting sitting);
 
@@ -32,11 +36,11 @@ public interface ISittingService
 
     // Get reservations by sitting Id
     Task<IEnumerable<Reservation>> GetReservationsAsync(int sittingId);
+
     // Get areas by sitting Id
     Task<IEnumerable<Area>> GetAreasAsync(int sittingId);
     Task<IQueryable<Table>> GetTablesAsync(int sittingId);
     Task<IQueryable<Table>> GetAvailableTablesAsync(int sittingId);
     Task<IQueryable<Table>> GetTakenTablesAsync(int sittingId);
     Task<Sitting> AddAreasToSitting(int sittingId, IEnumerable<int> areas);
-
 }

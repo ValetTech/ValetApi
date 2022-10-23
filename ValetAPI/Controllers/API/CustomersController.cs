@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ValetAPI.Models;
+using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
 
 namespace ValetAPI.Controllers.API;
 
 /// <summary>
-/// Customers endpoint
+///     Customers endpoint
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -13,18 +15,21 @@ namespace ValetAPI.Controllers.API;
 public class CustomersController : ControllerBase
 {
     private readonly ICustomerService _customerService;
+    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
+
 
     /// <summary>
     ///     Customer controllers constructor
     /// </summary>
     /// <param name="customerService"></param>
-    public CustomersController(ICustomerService customerService)
+    public CustomersController(ICustomerService customerService, AutoMapper.IConfigurationProvider mappingConfiguration)
     {
         _customerService = customerService;
+        _mappingConfiguration = mappingConfiguration;
     }
 
     /// <summary>
-    /// Gets all customers.
+    ///     Gets all customers.
     /// </summary>
     /// <returns>All customers</returns>
     /// <response code="200">Returns all customers</response>
@@ -32,11 +37,65 @@ public class CustomersController : ControllerBase
     [HttpGet("", Name = nameof(GetCustomers))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
+    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers([FromQuery] CustomerQueryParameters queryParameters)
     {
         var customers = await _customerService.GetCustomersAsync();
-        if (customers == null) return NotFound();
-        return Ok(customers);
+        
+        if (queryParameters.isVip.HasValue)
+        {
+            customers = customers.Where(c =>
+                c.IsVip == queryParameters.isVip.Value);
+        }
+        
+        if (queryParameters.hasReservations.HasValue)
+        {
+            customers = customers.Where(c =>
+                c.Reservations.Any() == queryParameters.hasReservations.Value);
+        }
+
+        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        {
+            customers = customers.Where(a =>
+                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
+                a.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+                a.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+                a.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+                a.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())
+            );
+        }
+
+        
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            if (typeof(Customer).GetProperty(queryParameters.SortBy) != null)
+            {
+                customers = customers.OrderByCustom(
+                    queryParameters.SortBy,
+                    queryParameters.SortOrder);
+            }
+        }
+        
+        customers = customers
+            .Skip(queryParameters.Size * (queryParameters.Page - 1))
+            .Take(queryParameters.Size);
+
+
+        var mapper = _mappingConfiguration.CreateMapper();
+         var customersDto = customers.Select(c => new {
+             c.Id,
+             c.FirstName,
+             c.LastName,
+             c.Email,
+             c.Phone,
+             c.IsVip,
+             c.FullName,
+             Reservations = mapper.Map<Models.DTO.Reservation[]>(c.Reservations)
+        });
+        
+
+        // Outta left join
+        return Ok(new {customers = await customersDto.ToArrayAsync()});
+        
     }
 
     /// <summary>
@@ -57,7 +116,7 @@ public class CustomersController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new customer.
+    ///     Create a new customer.
     /// </summary>
     /// <param name="customer">Customer Object</param>
     /// <returns>Newly created customer</returns>
@@ -70,12 +129,12 @@ public class CustomersController : ControllerBase
     {
         var id = await _customerService.CreateCustomerAsync(customer);
         var entity = await _customerService.GetCustomerAsync(id);
-        return Created($"api/customers/{id}", entity);
+        return CreatedAtAction($"GetCustomer",new { id = entity.Id }, entity);
     }
 
 
     /// <summary>
-    /// Update customer
+    ///     Update customer
     /// </summary>
     /// <param name="id">Customer Id</param>
     /// <param name="customer">Customer Object</param>
@@ -96,7 +155,7 @@ public class CustomersController : ControllerBase
 
 
     /// <summary>
-    /// Delete customer
+    ///     Delete customer
     /// </summary>
     /// <param name="id">Customer Id</param>
     /// <response code="201">Successfully deleted</response>
@@ -113,7 +172,7 @@ public class CustomersController : ControllerBase
 
     // GET: api/customer/5/reservations
     /// <summary>
-    /// Get all reservations for customer.
+    ///     Get all reservations for customer.
     /// </summary>
     /// <param name="id">Customer Id</param>
     /// <returns></returns>
