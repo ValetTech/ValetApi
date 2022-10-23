@@ -58,8 +58,6 @@ public class DefaultReservationService : IReservationService
         //     }).ToListAsync();
 
 
-        if (_context.Reservations == null) return null;
-
         var reservations = _context
             .Reservations
             // .Include(r => r.Customer)
@@ -78,7 +76,7 @@ public class DefaultReservationService : IReservationService
             //     Customer = r.Customer.,
             //
             // })
-            
+            // return _context.Reservations.FromSqlInterpolated($"SELECT * FROM reservations").AsQueryable().ProjectTo<Reservation>(_mappingConfiguration);
 
         return reservations.ProjectTo<Reservation>(_mappingConfiguration);
         // return await _context.Reservations.ProjectTo<Reservation>(_mappingConfiguration).ToListAsync();

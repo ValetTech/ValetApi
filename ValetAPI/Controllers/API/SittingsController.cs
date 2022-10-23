@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using ValetAPI.Data;
+using ValetAPI.Infrastructure;
 using ValetAPI.Models;
 using ValetAPI.Services;
 

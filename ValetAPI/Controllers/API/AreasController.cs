@@ -47,7 +47,7 @@ public async Task<ActionResult<IEnumerable<Area>>> GetAreas([FromQuery] DateTime
             // Outta left join
         }
         if (areas == null) return NotFound();
-        return Ok(await areas.ToArrayAsync());
+        return Ok(new { areas = await areas.ToArrayAsync()});
     }
 
     /// <summary>

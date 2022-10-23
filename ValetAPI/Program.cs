@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Converters;
 using ValetAPI.Data;
 using ValetAPI.Hubs;
@@ -55,10 +57,17 @@ public static class Program
         builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
             .AddEntityFrameworkStores<ApplicationDbContext>();
         builder.Services.AddControllersWithViews();
+        
         builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.AllowTrailingCommas = true;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+            })
             .AddNewtonsoftJson()
             .AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
             .AddNewtonsoftJson(x => x.SerializerSettings.Converters.Add(new StringEnumConverter()));
+        
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options =>
         {
@@ -74,6 +83,7 @@ public static class Program
         {
             options.DefaultApiVersion = new ApiVersion(1, 0);
             options.ApiVersionReader = new MediaTypeApiVersionReader();
+            // options.ApiVersionReader = new UrlSegmentApiVersionReader();
             options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
             options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);

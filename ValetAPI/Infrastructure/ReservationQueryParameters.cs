@@ -1,4 +1,4 @@
-﻿namespace ValetAPI.Models;
+﻿namespace ValetAPI.Infrastructure;
 
 public class ReservationQueryParameters : QueryParameters
 {
@@ -6,5 +6,6 @@ public class ReservationQueryParameters : QueryParameters
     public DateTime? MaxDate { get; set; }
     public DateTime? Date { get; set; }
     
-
+    // TODO: Add searching
+    // 
 }

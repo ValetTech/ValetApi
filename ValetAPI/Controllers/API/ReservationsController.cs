@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Data;
+using ValetAPI.Infrastructure;
 using ValetAPI.Models;
 using ValetAPI.Services;
 
@@ -51,15 +53,21 @@ public class ReservationsController : ControllerBase
             reservations = reservations.Where(r => r.DateTime.Date == queryParameters.Date.Value.Date);
         }
 
+        if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        {
+            if (typeof(Reservation).GetProperty(queryParameters.SortBy) != null)
+            {
+                reservations = reservations.OrderByCustom(queryParameters.SortBy, queryParameters.SortOrder);
+            }
+        }
+
         reservations = reservations
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
             .Take(queryParameters.Size);
 
-        if (reservations == null) return NotFound();
-        
-        
+        if (!await reservations.AnyAsync()) return NoContent();
 
-        var details = await reservations.Select(r => new
+        var details = reservations.Select(r => new
         {
             r.Id,
             r.CustomerId,
@@ -71,10 +79,10 @@ public class ReservationsController : ControllerBase
             r.Source,
             r.Status,
             r.Notes
-        })
-            .ToArrayAsync();
+        });
+        var response = new {reservations = (await reservations.ToArrayAsync())};
 
-        return Ok(await reservations.ToArrayAsync());
+        return Ok(response);
 
 
     }
