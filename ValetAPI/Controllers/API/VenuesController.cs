@@ -36,7 +36,7 @@ public class VenuesController : ControllerBase
     {
         var venues = await _venueService.GetVenuesAsync();
         if (venues == null) return NotFound();
-        return Ok(venues);
+        return Ok(new { venues });
     }
 
     /// <summary>

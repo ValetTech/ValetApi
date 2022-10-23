@@ -33,7 +33,7 @@ public class TablesController : ControllerBase
     {
         var tables = await _tableService.GetTablesAsync();
         if (tables == null) return NotFound();
-        return Ok(tables);
+        return Ok(new { tables });
     }
 
     /// <summary>
