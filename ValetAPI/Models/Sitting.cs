@@ -11,10 +11,12 @@ public class Sitting
     [DisplayFormat(DataFormatString = "{g}", ApplyFormatInEditMode = true)]
     // [DisplayFormat(DataFormatString = "{hh:mm tt}", ApplyFormatInEditMode = true)]
     [Display(Name = "Start Time")]
+    [Required]
     public DateTime StartTime { get; set; }
 
     [DisplayFormat(DataFormatString = "{g}", ApplyFormatInEditMode = true)]
     [Display(Name = "End Time")]
+    [Required]
     public DateTime EndTime { get; set; }
 
     // public int AreaId { get; set; }

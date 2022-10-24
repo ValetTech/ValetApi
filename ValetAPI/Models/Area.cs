@@ -9,9 +9,9 @@ public class Area
 
     [Required]
     [Display(Name = "Area")]
-    [StringLength(50)]
+    [StringLength(50, MinimumLength = 2, ErrorMessage = "Please provide a valid Area name.")]
     public string Name { get; set; }
-
+    
     public string Description { get; set; } = string.Empty;
 
     // Tables
