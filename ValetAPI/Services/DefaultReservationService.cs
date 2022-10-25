@@ -43,38 +43,14 @@ public class DefaultReservationService : IReservationService
     // Get All Reservations
     public async Task<IQueryable<Reservation>> GetReservationsAsync()
     {
-        // return await database
-        //     .Companies
-        //     .Select(c => new
-        //     {
-        //         c.Id,
-        //         c.Name,
-        //         Employees = c
-        //             .Employees
-        //             .Select(e => new { e.Id, e.Name })
-        //             .ToList()
-        //     }).ToListAsync();
-
-
         var reservations = _context
             .Reservations
             // .Include(r => r.Customer)
             // .Include(r => r.Tables)
             // .Include(r => r.Sitting)
             // .Include(r => r.Venue)
+            .AsSplitQuery()
             .AsQueryable();
-        // .Include(r=>r.)
-        // .Select(r=> new
-        // {
-        //     r.Id,
-        //     r.VenueId,
-        //     r.DateTime,
-        //     r.Duration,
-        //     r.
-        //     Customer = r.Customer.,
-        //
-        // })
-        // return _context.Reservations.FromSqlInterpolated($"SELECT * FROM reservations").AsQueryable().ProjectTo<Reservation>(_mappingConfiguration);
 
         return reservations.ProjectTo<Reservation>(_mappingConfiguration);
         // return await _context.Reservations.ProjectTo<Reservation>(_mappingConfiguration).ToListAsync();
@@ -89,6 +65,7 @@ public class DefaultReservationService : IReservationService
             .Include(r => r.Tables)
             .Include(r => r.Sitting)
             .Include(r => r.Venue)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         if (reservation == null) return null;
@@ -136,20 +113,21 @@ public class DefaultReservationService : IReservationService
 
     public async Task UpdateReservationAsync(Reservation reservation)
     {
+        
         var mapper = _mappingConfiguration.CreateMapper();
 
-        _context.Entry(mapper.Map<ReservationEntity>(reservation)).State = EntityState.Modified;
+        var entity = await _context.Reservations.FirstOrDefaultAsync(v => v.Id == reservation.Id);
+        if (entity == null) throw new HttpResponseException(404, "Reservation not found.");
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            throw new HttpResponseException(400, "Could not update reservation.");
-        }
+        var reservationEntity = mapper.Map<ReservationEntity>(reservation);
+
+        _context.Entry(entity).CurrentValues.SetValues(reservationEntity);
+
+        var created = await _context.SaveChangesAsync();
+        if (created < 1) throw new HttpResponseException(400, "Could not update reservation.");
+        
     }
-
+    
     public async Task DeleteReservationAsync(int reservationId)
     {
         var reservation = await _context.Reservations.FindAsync(reservationId);

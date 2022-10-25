@@ -96,7 +96,7 @@ public class DefaultCustomerService : ICustomerService
         _context.Entry(entity).CurrentValues.SetValues(mapper.Map<CustomerEntity>(customer));
 
         var created = await _context.SaveChangesAsync();
-        if (created < 1) throw new InvalidOperationException("Could not update customer.");
+        if (created < 1) throw new HttpResponseException(400, "Could not update customer.");
     }
 
     public async Task<IEnumerable<Reservation>> GetReservationsAsync(int customerId)

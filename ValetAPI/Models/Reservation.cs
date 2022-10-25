@@ -27,6 +27,7 @@ public class Reservation
 
     public Source? Source { get; set; }
 
+    public int VenueId { get; set; } = 1;
     //public Venue Venue { get; set; }
     public List<Table> Tables { get; set; } = new();
     public State Status { get; set; } = State.Pending;

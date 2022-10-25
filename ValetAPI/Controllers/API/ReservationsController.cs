@@ -40,25 +40,25 @@ public class ReservationsController : ControllerBase
         //YYYY-MM-DDTHH:MM:SS
         var reservations = await _reservationService.GetReservationsAsync();
 
-        if (queryParameters.MinDate != null)
+        if (queryParameters.MinDate.HasValue)
             reservations = reservations.Where(r => r.DateTime >= queryParameters.MinDate.Value);
 
-        if (queryParameters.MaxDate != null)
+        if (queryParameters.MaxDate.HasValue)
             reservations = reservations.Where(r => r.DateTime <= queryParameters.MaxDate.Value);
 
-        if (queryParameters.Date != null)
+        if (queryParameters.Date.HasValue)
             reservations = reservations.Where(r => r.DateTime.Date == queryParameters.Date.Value.Date);
 
-        if (queryParameters.Duration != null)
+        if (queryParameters.Duration.HasValue)
             reservations = reservations.Where(r => r.Duration == queryParameters.Duration);
         
-        if (queryParameters.Guests != null)
+        if (queryParameters.Guests.HasValue)
             reservations = reservations.Where(r => r.NoGuests == queryParameters.Guests);
         
-        if (queryParameters.Source != null)
+        if (queryParameters.Source.HasValue)
             reservations = reservations.Where(r => r.Source == queryParameters.Source);
         
-        if (queryParameters.Status != null)
+        if (queryParameters.Status.HasValue)
             reservations = reservations.Where(r => r.Status == queryParameters.Status);
         
         
@@ -172,9 +172,9 @@ public class ReservationsController : ControllerBase
 
         await _reservationService.UpdateReservationAsync(reservation);
 
-        if (!await ReservationExistsAsync(id))
-            return NotFound();
-        return BadRequest();
+        // if (!await ReservationExistsAsync(id))
+        //     return NotFound();
+        return NoContent();
     }
 
 
