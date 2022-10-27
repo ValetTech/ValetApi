@@ -124,8 +124,20 @@ public class AreasController : ControllerBase
     {
         var id = await _areaService.CreateAreaAsync(area);
 
-        if (area.NoTables.HasValue && area.TableCapacity.HasValue)
-            await _tablesService.CreateTablesAsync(area.NoTables.Value, area.TableCapacity.Value, id);
+        // if (area.NoTables.HasValue && area.TableCapacity.HasValue)
+        // {
+        //     var tables = new List<Table>();
+        //     for (var i = 0; i < area.NoTables.Value; i++)
+        //         tables.Add(new Table
+        //         {
+        //             Type = "Square",
+        //             AreaId = id,
+        //             Capacity =  area.TableCapacity.Value
+        //         });
+        //     await _tablesService.CreateTablesAsync(tables.ToArray());
+        //
+        // }
+        
 
 
         var entity = await _areaService.GetAreaAsync(id);

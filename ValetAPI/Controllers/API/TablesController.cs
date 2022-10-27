@@ -74,14 +74,27 @@ public class TablesController : ControllerBase
     /// </summary>
     /// <param name="table">Table Object</param>
     /// <returns></returns>
-    [HttpPost(Name = nameof(CreateTable))]
+    // [HttpPost(Name = nameof(CreateTable))]
+    // [ProducesResponseType(400)]
+    // [ProducesResponseType(201)]
+    // public async Task<ActionResult<Table>> CreateTable(Table table)
+    // {
+    //     var tableId = await _tableService.CreateTableAsync(table);
+    //     var tableEntity = await _tableService.GetTableAsync(tableId);
+    //     return Created($"api/table/{tableId}", tableEntity);
+    // }
+
+    /// <summary>
+    ///     Create new tables.
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("", Name = nameof(CreateTables))]
     [ProducesResponseType(400)]
-    [ProducesResponseType(201)]
-    public async Task<ActionResult<Table>> CreateTable(Table table)
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> CreateTables([FromBody]Table[] tables)
     {
-        var tableId = await _tableService.CreateTableAsync(table);
-        var tableEntity = await _tableService.GetTableAsync(tableId);
-        return Created($"api/table/{tableId}", tableEntity);
+        await _tableService.CreateTablesAsync(tables);
+        return NoContent();
     }
 
     /// <summary>

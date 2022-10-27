@@ -49,24 +49,14 @@ public class DefaultTableService : ITableService
     }
 
     /// <summary>
+    /// Create multiple tables
     /// </summary>
-    /// <param name="noTables"></param>
-    /// <param name="tableCapacity"></param>
-    /// <param name="areaId"></param>
+    /// <param name="tables"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public async Task CreateTablesAsync(int noTables, int tableCapacity, int areaId)
+    public async Task CreateTablesAsync(Table[] tables)
     {
         var mapper = _mappingConfiguration.CreateMapper();
 
-        var tables = new List<Table>();
-
-        for (var i = 0; i < noTables; i++)
-            tables.Add(new Table
-            {
-                Type = "Square",
-                AreaId = areaId,
-                Capacity = tableCapacity
-            });
 
         await _context.Tables.AddRangeAsync(mapper.Map<TableEntity[]>(tables));
 

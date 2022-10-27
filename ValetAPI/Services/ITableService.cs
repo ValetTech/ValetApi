@@ -22,7 +22,7 @@ public interface ITableService
     Task<int> CreateTableAsync(Table table);
 
     // Create Tables
-    Task CreateTablesAsync(int noTables, int tableCapacity, int areaId);
+    Task CreateTablesAsync(Table[] tables);
 
     // Delete Table by Id
     Task DeleteTableAsync(int tableId);
