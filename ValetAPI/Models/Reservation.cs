@@ -11,6 +11,8 @@ public class Reservation
     [Required]
     public int SittingId { get; set; }
     public Sitting? Sitting { get; set; }
+    public int AreaId { get; set; }
+    public Area? Area { get; set; }
 
     [DataType(DataType.Time)]
     [DisplayFormat(DataFormatString = "{hh:mm tt}", ApplyFormatInEditMode = true)]

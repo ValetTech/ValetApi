@@ -65,6 +65,42 @@ namespace ValetAPI.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SittingTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SittingTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Sources",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    Source = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sources", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "States",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false),
+                    State = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_States", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Venues",
                 columns: table => new
                 {
@@ -265,12 +301,19 @@ namespace ValetAPI.Migrations
                     NoGuests = table.Column<int>(type: "int", nullable: false),
                     Source = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     VenueId = table.Column<int>(type: "int", nullable: false),
+                    AreaId = table.Column<int>(type: "int", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Reservations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Reservations_Areas_AreaId",
+                        column: x => x.AreaId,
+                        principalTable: "Areas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Reservations_Customers_CustomerId",
                         column: x => x.CustomerId,
@@ -330,6 +373,41 @@ namespace ValetAPI.Migrations
                 });
 
             migrationBuilder.InsertData(
+                table: "SittingTypes",
+                columns: new[] { "Id", "Type" },
+                values: new object[,]
+                {
+                    { 0, "Breakfast" },
+                    { 1, "Lunch" },
+                    { 2, "Dinner" },
+                    { 3, "Special" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Sources",
+                columns: new[] { "Id", "Source" },
+                values: new object[,]
+                {
+                    { 0, "Website" },
+                    { 1, "InPerson" },
+                    { 2, "Email" },
+                    { 3, "Phone" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "States",
+                columns: new[] { "Id", "State" },
+                values: new object[,]
+                {
+                    { 0, "Pending" },
+                    { 1, "Confirmed" },
+                    { 2, "Cancelled" },
+                    { 3, "Assigned" },
+                    { 4, "Seated" },
+                    { 5, "Completed" }
+                });
+
+            migrationBuilder.InsertData(
                 table: "Venues",
                 columns: new[] { "Id", "Address", "Name" },
                 values: new object[] { 1, "123 George St", "Saki" });
@@ -339,9 +417,9 @@ namespace ValetAPI.Migrations
                 columns: new[] { "Id", "Description", "Name", "VenueId" },
                 values: new object[,]
                 {
-                    { 11, "Gorgeous Main Dining AreaEntity", "Main Dining", 1 },
-                    { 12, "Outside with a view", "Outside", 1 },
-                    { 13, "Upstairs away from the noise", "Upstairs", 1 }
+                    { 1, "Main Dining Area", "Main", 1 },
+                    { 2, "Outside Dining Area", "Outside", 1 },
+                    { 3, "Balcony Dining Area", "Balcony", 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -349,15 +427,15 @@ namespace ValetAPI.Migrations
                 columns: new[] { "Id", "Capacity", "EndTime", "StartTime", "Type", "VenueId" },
                 values: new object[,]
                 {
-                    { 111, 50, new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified), "Breakfast", 1 },
-                    { 112, 50, new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified), "Lunch", 1 },
-                    { 113, 50, new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified), "Dinner", 1 },
-                    { 121, 50, new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified), "Breakfast", 1 },
-                    { 122, 50, new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified), "Lunch", 1 },
-                    { 123, 50, new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified), "Dinner", 1 },
-                    { 131, 50, new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified), "Breakfast", 1 },
-                    { 132, 50, new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified), "Lunch", 1 },
-                    { 133, 50, new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified), "Dinner", 1 }
+                    { 11, 50, new DateTime(2022, 12, 25, 1, 30, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 24, 23, 30, 0, 0, DateTimeKind.Utc), "Breakfast", 1 },
+                    { 12, 50, new DateTime(2022, 12, 25, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 25, 2, 0, 0, 0, DateTimeKind.Utc), "Lunch", 1 },
+                    { 13, 50, new DateTime(2022, 12, 25, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 25, 6, 30, 0, 0, DateTimeKind.Utc), "Dinner", 1 },
+                    { 21, 50, new DateTime(2022, 12, 25, 1, 30, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 24, 23, 30, 0, 0, DateTimeKind.Utc), "Breakfast", 1 },
+                    { 22, 50, new DateTime(2022, 12, 25, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 25, 2, 0, 0, 0, DateTimeKind.Utc), "Lunch", 1 },
+                    { 23, 50, new DateTime(2022, 12, 25, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 25, 6, 30, 0, 0, DateTimeKind.Utc), "Dinner", 1 },
+                    { 31, 50, new DateTime(2022, 12, 25, 1, 30, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 24, 23, 30, 0, 0, DateTimeKind.Utc), "Breakfast", 1 },
+                    { 32, 50, new DateTime(2022, 12, 25, 5, 0, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 25, 2, 0, 0, 0, DateTimeKind.Utc), "Lunch", 1 },
+                    { 33, 50, new DateTime(2022, 12, 25, 12, 0, 0, 0, DateTimeKind.Utc), new DateTime(2022, 12, 25, 6, 30, 0, 0, DateTimeKind.Utc), "Dinner", 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -365,15 +443,52 @@ namespace ValetAPI.Migrations
                 columns: new[] { "AreaId", "SittingId" },
                 values: new object[,]
                 {
-                    { 11, 111 },
-                    { 11, 112 },
-                    { 11, 113 },
-                    { 12, 121 },
-                    { 12, 122 },
-                    { 12, 123 },
-                    { 13, 131 },
-                    { 13, 132 },
-                    { 13, 133 }
+                    { 1, 11 },
+                    { 1, 12 },
+                    { 1, 13 },
+                    { 2, 21 },
+                    { 2, 22 },
+                    { 2, 23 },
+                    { 3, 31 },
+                    { 3, 32 },
+                    { 3, 33 }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Tables",
+                columns: new[] { "Id", "AreaId", "Capacity", "ReservationId", "Type", "VenueId" },
+                values: new object[,]
+                {
+                    { 11, 1, 1, null, "M1", 0 },
+                    { 12, 1, 2, null, "M2", 0 },
+                    { 13, 1, 3, null, "M3", 0 },
+                    { 14, 1, 4, null, "M4", 0 },
+                    { 15, 1, 5, null, "M5", 0 },
+                    { 16, 1, 6, null, "M6", 0 },
+                    { 17, 1, 7, null, "M7", 0 },
+                    { 18, 1, 8, null, "M8", 0 },
+                    { 19, 1, 9, null, "M9", 0 },
+                    { 20, 1, 10, null, "M10", 0 },
+                    { 21, 2, 1, null, "O1", 0 },
+                    { 22, 2, 2, null, "O2", 0 },
+                    { 23, 2, 3, null, "O3", 0 },
+                    { 24, 2, 4, null, "O4", 0 },
+                    { 25, 2, 5, null, "O5", 0 },
+                    { 26, 2, 6, null, "O6", 0 },
+                    { 27, 2, 7, null, "O7", 0 },
+                    { 28, 2, 8, null, "O8", 0 },
+                    { 29, 2, 9, null, "O9", 0 },
+                    { 30, 2, 10, null, "O10", 0 },
+                    { 31, 3, 1, null, "B1", 0 },
+                    { 32, 3, 2, null, "B2", 0 },
+                    { 33, 3, 3, null, "B3", 0 },
+                    { 34, 3, 4, null, "B4", 0 },
+                    { 35, 3, 5, null, "B5", 0 },
+                    { 36, 3, 6, null, "B6", 0 },
+                    { 37, 3, 7, null, "B7", 0 },
+                    { 38, 3, 8, null, "B8", 0 },
+                    { 39, 3, 9, null, "B9", 0 },
+                    { 40, 3, 10, null, "B10", 0 }
                 });
 
             migrationBuilder.CreateIndex(
@@ -424,6 +539,11 @@ namespace ValetAPI.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Reservations_AreaId",
+                table: "Reservations",
+                column: "AreaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Reservations_CustomerId",
@@ -477,6 +597,15 @@ namespace ValetAPI.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "SittingTypes");
+
+            migrationBuilder.DropTable(
+                name: "Sources");
+
+            migrationBuilder.DropTable(
+                name: "States");
+
+            migrationBuilder.DropTable(
                 name: "Tables");
 
             migrationBuilder.DropTable(
@@ -486,10 +615,10 @@ namespace ValetAPI.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Areas");
+                name: "Reservations");
 
             migrationBuilder.DropTable(
-                name: "Reservations");
+                name: "Areas");
 
             migrationBuilder.DropTable(
                 name: "Customers");

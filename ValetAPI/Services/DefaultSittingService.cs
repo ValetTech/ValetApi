@@ -71,7 +71,11 @@ public class DefaultSittingService : ISittingService
     {
         var mapper = _mappingConfiguration.CreateMapper();
 
+        sitting.StartTime.ToUniversalTime();
+        sitting.EndTime.ToUniversalTime();
+
         var entity = await _context.Sittings.AddAsync(mapper.Map<SittingEntity>(sitting));
+        
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not create sitting.");
 
@@ -92,6 +96,9 @@ public class DefaultSittingService : ISittingService
     public async Task UpdateSittingAsync(Sitting sitting)
     {
         var mapper = _mappingConfiguration.CreateMapper();
+        
+        sitting.StartTime.ToUniversalTime();
+        sitting.EndTime.ToUniversalTime();
 
         var entity = await _context.Sittings.FirstOrDefaultAsync(v => v.Id == sitting.Id);
         if (entity == null) return;

@@ -10,29 +10,25 @@ public static class DbSeeder
         var venues = new List<VenueEntity>
         {
             new() {Id = 1, Name = "Saki", Address = "123 George St"}
-            // new() { Id = 2, Name = "Maccas", Address = "321 Frank St" },
-            // new() { Id = 3, Name = "Red Rooster", Address = "999 Kent St" },
-            // new() { Id = 4, Name = "Guzman Y Gomez", Address = "555 Parade Dr" }
         };
 
         modelBuilder.Entity<VenueEntity>().HasData(venues);
+        
+        
 
         var areas = new List<AreaEntity>();
-        foreach (var venue in venues)
-        {
             areas.Add(new AreaEntity
             {
-                Id = venue.Id * 10 + 1, VenueId = venue.Id, Name = "Main Dining",
-                Description = "Gorgeous Main Dining AreaEntity"
+                Id = 1, VenueId = 1, Name = "Main",
+                Description = "Main Dining Area"
             });
             areas.Add(new AreaEntity
-                {Id = venue.Id * 10 + 2, VenueId = venue.Id, Name = "Outside", Description = "Outside with a view"});
+                {Id = 2, VenueId = 1, Name = "Outside", Description = "Outside Dining Area"});
             areas.Add(new AreaEntity
             {
-                Id = venue.Id * 10 + 3, VenueId = venue.Id, Name = "Upstairs",
-                Description = "Upstairs away from the noise"
+                Id = 3, VenueId = 1, Name = "Balcony",
+                Description = "Balcony Dining Area"
             });
-        }
 
         modelBuilder.Entity<AreaEntity>().HasData(areas);
 
@@ -86,5 +82,33 @@ public static class DbSeeder
         };
 
         modelBuilder.Entity<CustomerEntity>().HasData(customers);
+
+        var tables = new List<TableEntity>();
+
+        for (var i = 1; i < 11; i++)
+        {
+            tables.Add(new TableEntity
+            {
+                Id = 10 + i,
+                Type = $"M{i}",
+                Capacity = i,
+                AreaId = 1
+            });
+            tables.Add(new TableEntity
+            {
+                Id = 20 + i,
+                Type = $"O{i}",
+                Capacity = i,
+                AreaId = 2
+            });
+            tables.Add(new TableEntity
+            {
+                Id = 30 + i,
+                Type = $"B{i}",
+                Capacity = i,
+                AreaId = 3
+            });
+        }
+        modelBuilder.Entity<TableEntity>().HasData(tables);
     }
 }

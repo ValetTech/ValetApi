@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ValetAPI.Models;
 
 namespace ValetAPI.Data;
@@ -25,7 +26,43 @@ public class ApplicationDbContext : IdentityDbContext
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
+        
+        var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
+            v => v.ToUniversalTime(),
+            v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+        var nullableDateTimeConverter = new ValueConverter<DateTime?, DateTime?>(
+            v => v.HasValue ? v.Value.ToUniversalTime() : v,
+            v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
+
+        foreach (var entityType in mb.Model.GetEntityTypes())
+        {
+            if (entityType.IsKeyless)
+            {
+                continue;
+            }
+
+            foreach (var property in entityType.GetProperties())
+            {
+                if (property.ClrType == typeof(DateTime))
+                {
+                    property.SetValueConverter(dateTimeConverter);
+                }
+                else if (property.ClrType == typeof(DateTime?))
+                {
+                    property.SetValueConverter(nullableDateTimeConverter);
+                }
+            }
+        }
+        
+        // mb.Property(x => x.StartTime).HasConversion((x) => x.ToUniversalTime(), (x) => DateTime.SpecifyKind(x, DateTimeKind.Utc) );
+
+        // mb.Entity<SittingEntity>()
+        //     .Property(e => e.StartTime)
+        //     .HasConversion(
+        //         v => v,
+        //         v => new DateTime(v.Ticks, DateTimeKind.Utc));
+        
         mb.Seed();
 
 
@@ -79,7 +116,22 @@ public class ApplicationDbContext : IdentityDbContext
         // mb.Entity<ReservationEntity>()
         //     .Property(b => b.Id)
         //     .HasColumnName("ReservationId");
+        
+        // mb.Entity<ReservationEntity>()
+        //     .HasOne(k => k.AreaId)
+        //     .WithMany(c => c.Res)
+        //     .OnDelete(DeleteBehavior.Restrict);
 
+        // mb.Entity<ReservationEntity>()
+        //     .HasOne(k => k.Venue)
+        //     .WithMany(k => k.Reservations)
+        //     .OnDelete(DeleteBehavior.Restrict);
+        //
+        // mb.Entity<ReservationEntity>()
+        //     .HasOne(k => k.Area)
+        //     .WithMany(k => k.Reservations)
+        //     .OnDelete(DeleteBehavior.Restrict);
+        
         mb.Entity<AreaEntity>()
             .HasOne(k => k.Venue)
             .WithMany(c => c.Areas)

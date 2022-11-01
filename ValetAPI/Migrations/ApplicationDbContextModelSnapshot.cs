@@ -251,23 +251,23 @@ namespace ValetAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 11,
-                            Description = "Gorgeous Main Dining AreaEntity",
-                            Name = "Main Dining",
+                            Id = 1,
+                            Description = "Main Dining Area",
+                            Name = "Main",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 12,
-                            Description = "Outside with a view",
+                            Id = 2,
+                            Description = "Outside Dining Area",
                             Name = "Outside",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 13,
-                            Description = "Upstairs away from the noise",
-                            Name = "Upstairs",
+                            Id = 3,
+                            Description = "Balcony Dining Area",
+                            Name = "Balcony",
                             VenueId = 1
                         });
                 });
@@ -289,48 +289,48 @@ namespace ValetAPI.Migrations
                     b.HasData(
                         new
                         {
-                            AreaId = 11,
-                            SittingId = 111
+                            AreaId = 1,
+                            SittingId = 11
                         },
                         new
                         {
-                            AreaId = 11,
-                            SittingId = 112
+                            AreaId = 1,
+                            SittingId = 12
                         },
                         new
                         {
-                            AreaId = 11,
-                            SittingId = 113
+                            AreaId = 1,
+                            SittingId = 13
                         },
                         new
                         {
-                            AreaId = 12,
-                            SittingId = 121
+                            AreaId = 2,
+                            SittingId = 21
                         },
                         new
                         {
-                            AreaId = 12,
-                            SittingId = 122
+                            AreaId = 2,
+                            SittingId = 22
                         },
                         new
                         {
-                            AreaId = 12,
-                            SittingId = 123
+                            AreaId = 2,
+                            SittingId = 23
                         },
                         new
                         {
-                            AreaId = 13,
-                            SittingId = 131
+                            AreaId = 3,
+                            SittingId = 31
                         },
                         new
                         {
-                            AreaId = 13,
-                            SittingId = 132
+                            AreaId = 3,
+                            SittingId = 32
                         },
                         new
                         {
-                            AreaId = 13,
-                            SittingId = 133
+                            AreaId = 3,
+                            SittingId = 33
                         });
                 });
 
@@ -396,6 +396,9 @@ namespace ValetAPI.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("AreaId")
+                        .HasColumnType("int");
+
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
@@ -426,6 +429,8 @@ namespace ValetAPI.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AreaId");
 
                     b.HasIndex("CustomerId");
 
@@ -469,82 +474,82 @@ namespace ValetAPI.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 111,
+                            Id = 11,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 1, 30, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 24, 23, 30, 0, 0, DateTimeKind.Utc),
                             Type = "Breakfast",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 112,
+                            Id = 12,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 5, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 25, 2, 0, 0, 0, DateTimeKind.Utc),
                             Type = "Lunch",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 113,
+                            Id = 13,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 12, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 25, 6, 30, 0, 0, DateTimeKind.Utc),
                             Type = "Dinner",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 121,
+                            Id = 21,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 1, 30, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 24, 23, 30, 0, 0, DateTimeKind.Utc),
                             Type = "Breakfast",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 122,
+                            Id = 22,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 5, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 25, 2, 0, 0, 0, DateTimeKind.Utc),
                             Type = "Lunch",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 123,
+                            Id = 23,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 12, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 25, 6, 30, 0, 0, DateTimeKind.Utc),
                             Type = "Dinner",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 131,
+                            Id = 31,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 12, 30, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 10, 30, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 1, 30, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 24, 23, 30, 0, 0, DateTimeKind.Utc),
                             Type = "Breakfast",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 132,
+                            Id = 32,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 16, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 13, 0, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 5, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 25, 2, 0, 0, 0, DateTimeKind.Utc),
                             Type = "Lunch",
                             VenueId = 1
                         },
                         new
                         {
-                            Id = 133,
+                            Id = 33,
                             Capacity = 50,
-                            EndTime = new DateTime(2022, 12, 25, 23, 0, 0, 0, DateTimeKind.Unspecified),
-                            StartTime = new DateTime(2022, 12, 25, 17, 30, 0, 0, DateTimeKind.Unspecified),
+                            EndTime = new DateTime(2022, 12, 25, 12, 0, 0, 0, DateTimeKind.Utc),
+                            StartTime = new DateTime(2022, 12, 25, 6, 30, 0, 0, DateTimeKind.Utc),
                             Type = "Dinner",
                             VenueId = 1
                         });
@@ -699,6 +704,248 @@ namespace ValetAPI.Migrations
                     b.HasIndex("ReservationId");
 
                     b.ToTable("Tables");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 11,
+                            AreaId = 1,
+                            Capacity = 1,
+                            Type = "M1",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 21,
+                            AreaId = 2,
+                            Capacity = 1,
+                            Type = "O1",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 31,
+                            AreaId = 3,
+                            Capacity = 1,
+                            Type = "B1",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 12,
+                            AreaId = 1,
+                            Capacity = 2,
+                            Type = "M2",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 22,
+                            AreaId = 2,
+                            Capacity = 2,
+                            Type = "O2",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 32,
+                            AreaId = 3,
+                            Capacity = 2,
+                            Type = "B2",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 13,
+                            AreaId = 1,
+                            Capacity = 3,
+                            Type = "M3",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 23,
+                            AreaId = 2,
+                            Capacity = 3,
+                            Type = "O3",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 33,
+                            AreaId = 3,
+                            Capacity = 3,
+                            Type = "B3",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 14,
+                            AreaId = 1,
+                            Capacity = 4,
+                            Type = "M4",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 24,
+                            AreaId = 2,
+                            Capacity = 4,
+                            Type = "O4",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 34,
+                            AreaId = 3,
+                            Capacity = 4,
+                            Type = "B4",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 15,
+                            AreaId = 1,
+                            Capacity = 5,
+                            Type = "M5",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 25,
+                            AreaId = 2,
+                            Capacity = 5,
+                            Type = "O5",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 35,
+                            AreaId = 3,
+                            Capacity = 5,
+                            Type = "B5",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 16,
+                            AreaId = 1,
+                            Capacity = 6,
+                            Type = "M6",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 26,
+                            AreaId = 2,
+                            Capacity = 6,
+                            Type = "O6",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 36,
+                            AreaId = 3,
+                            Capacity = 6,
+                            Type = "B6",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 17,
+                            AreaId = 1,
+                            Capacity = 7,
+                            Type = "M7",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 27,
+                            AreaId = 2,
+                            Capacity = 7,
+                            Type = "O7",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 37,
+                            AreaId = 3,
+                            Capacity = 7,
+                            Type = "B7",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 18,
+                            AreaId = 1,
+                            Capacity = 8,
+                            Type = "M8",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 28,
+                            AreaId = 2,
+                            Capacity = 8,
+                            Type = "O8",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 38,
+                            AreaId = 3,
+                            Capacity = 8,
+                            Type = "B8",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 19,
+                            AreaId = 1,
+                            Capacity = 9,
+                            Type = "M9",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 29,
+                            AreaId = 2,
+                            Capacity = 9,
+                            Type = "O9",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 39,
+                            AreaId = 3,
+                            Capacity = 9,
+                            Type = "B9",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 20,
+                            AreaId = 1,
+                            Capacity = 10,
+                            Type = "M10",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 30,
+                            AreaId = 2,
+                            Capacity = 10,
+                            Type = "O10",
+                            VenueId = 0
+                        },
+                        new
+                        {
+                            Id = 40,
+                            AreaId = 3,
+                            Capacity = 10,
+                            Type = "B10",
+                            VenueId = 0
+                        });
                 });
 
             modelBuilder.Entity("ValetAPI.Models.VenueEntity", b =>
@@ -813,6 +1060,12 @@ namespace ValetAPI.Migrations
 
             modelBuilder.Entity("ValetAPI.Models.ReservationEntity", b =>
                 {
+                    b.HasOne("ValetAPI.Models.AreaEntity", "Area")
+                        .WithMany("Reservations")
+                        .HasForeignKey("AreaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ValetAPI.Models.CustomerEntity", "Customer")
                         .WithMany("Reservations")
                         .HasForeignKey("CustomerId")
@@ -830,6 +1083,8 @@ namespace ValetAPI.Migrations
                         .HasForeignKey("VenueId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Area");
 
                     b.Navigation("Customer");
 
@@ -869,6 +1124,8 @@ namespace ValetAPI.Migrations
             modelBuilder.Entity("ValetAPI.Models.AreaEntity", b =>
                 {
                     b.Navigation("AreaSittings");
+
+                    b.Navigation("Reservations");
 
                     b.Navigation("Tables");
                 });

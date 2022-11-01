@@ -109,6 +109,8 @@ public class ReservationsController : ControllerBase
             Customer = mapper.Map<Models.DTO.Customer>(r.Customer),
             r.SittingId,
             Sitting = mapper.Map<Models.DTO.Sitting>(r.Sitting),
+            r.AreaId,
+            Area = mapper.Map<Models.DTO.Area>(r.Area),
             r.DateTime,
             r.Duration,
             r.NoGuests,
