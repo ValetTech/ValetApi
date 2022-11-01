@@ -86,6 +86,8 @@ public class AreasController : ControllerBase
             a.Id,
             a.Name,
             a.Description,
+            a.Width,
+            a.Height,
             a.Tables,
             sittings = mapper.Map<Models.DTO.Sitting[]>(a.Sittings)
         });
@@ -138,8 +140,6 @@ public class AreasController : ControllerBase
         //
         // }
         
-
-
         var entity = await _areaService.GetAreaAsync(id);
         if (entity == null) return BadRequest();
         return CreatedAtAction($"GetArea",new { id = entity.Id }, entity);
