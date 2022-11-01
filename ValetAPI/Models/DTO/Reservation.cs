@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace ValetAPI.Models.DTO;
 
@@ -18,8 +17,8 @@ public class Reservation
 
     public Source? Source { get; set; }
 
-    [JsonIgnore]
-    public List<Table> Tables { get; set; } = new();
+    [JsonIgnore] public List<Table> Tables { get; set; } = new();
+
     public State Status { get; set; } = State.Pending;
     public string? Notes { get; set; }
 }

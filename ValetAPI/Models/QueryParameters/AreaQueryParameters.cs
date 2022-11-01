@@ -12,6 +12,6 @@ public class AreaQueryParameters : QueryParameters
 
     // SEARCH
     public string Name { get; set; } = string.Empty;
-    
+
     // SORT
 }

@@ -19,7 +19,7 @@ public class ReservationEntity
     public Source Source { get; set; }
     public int VenueId { get; set; }
     public VenueEntity Venue { get; set; }
-    
+
     public int AreaId { get; set; }
     public AreaEntity Area { get; set; }
 

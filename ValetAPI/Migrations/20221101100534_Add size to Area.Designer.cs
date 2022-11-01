@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ValetAPI.Data;
 
@@ -11,9 +12,10 @@ using ValetAPI.Data;
 namespace ValetAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221101100534_Add size to Area")]
+    partial class AddsizetoArea
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -709,12 +711,6 @@ namespace ValetAPI.Migrations
                     b.Property<int>("VenueId")
                         .HasColumnType("int");
 
-                    b.Property<int>("xPosition")
-                        .HasColumnType("int");
-
-                    b.Property<int>("yPosition")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AreaId");
@@ -730,9 +726,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 1,
                             Type = "M1",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -740,9 +734,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 1,
                             Type = "O1",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -750,9 +742,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 1,
                             Type = "B1",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -760,9 +750,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 2,
                             Type = "M2",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -770,9 +758,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 2,
                             Type = "O2",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -780,9 +766,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 2,
                             Type = "B2",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -790,9 +774,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 3,
                             Type = "M3",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -800,9 +782,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 3,
                             Type = "O3",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -810,9 +790,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 3,
                             Type = "B3",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -820,9 +798,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 4,
                             Type = "M4",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -830,9 +806,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 4,
                             Type = "O4",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -840,9 +814,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 4,
                             Type = "B4",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -850,9 +822,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 5,
                             Type = "M5",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -860,9 +830,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 5,
                             Type = "O5",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -870,9 +838,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 5,
                             Type = "B5",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -880,9 +846,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 6,
                             Type = "M6",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -890,9 +854,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 6,
                             Type = "O6",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -900,9 +862,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 6,
                             Type = "B6",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -910,9 +870,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 7,
                             Type = "M7",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -920,9 +878,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 7,
                             Type = "O7",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -930,9 +886,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 7,
                             Type = "B7",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -940,9 +894,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 8,
                             Type = "M8",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -950,9 +902,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 8,
                             Type = "O8",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -960,9 +910,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 8,
                             Type = "B8",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -970,9 +918,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 9,
                             Type = "M9",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -980,9 +926,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 9,
                             Type = "O9",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -990,9 +934,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 9,
                             Type = "B9",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -1000,9 +942,7 @@ namespace ValetAPI.Migrations
                             AreaId = 1,
                             Capacity = 10,
                             Type = "M10",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -1010,9 +950,7 @@ namespace ValetAPI.Migrations
                             AreaId = 2,
                             Capacity = 10,
                             Type = "O10",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         },
                         new
                         {
@@ -1020,9 +958,7 @@ namespace ValetAPI.Migrations
                             AreaId = 3,
                             Capacity = 10,
                             Type = "B10",
-                            VenueId = 0,
-                            xPosition = 0,
-                            yPosition = 0
+                            VenueId = 0
                         });
                 });
 

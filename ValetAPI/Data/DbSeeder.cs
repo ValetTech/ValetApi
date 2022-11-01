@@ -20,14 +20,20 @@ public static class DbSeeder
             areas.Add(new AreaEntity
             {
                 Id = 1, VenueId = 1, Name = "Main",
-                Description = "Main Dining Area"
+                Description = "Main Dining Area",
+                Width = 10, Height = 10
             });
             areas.Add(new AreaEntity
-                {Id = 2, VenueId = 1, Name = "Outside", Description = "Outside Dining Area"});
+            {
+                Id = 2, VenueId = 1, Name = "Outside", 
+                Description = "Outside Dining Area",
+                Width = 10, Height = 10
+            });
             areas.Add(new AreaEntity
             {
                 Id = 3, VenueId = 1, Name = "Balcony",
-                Description = "Balcony Dining Area"
+                Description = "Balcony Dining Area",
+                Width = 10, Height = 10
             });
 
         modelBuilder.Entity<AreaEntity>().HasData(areas);

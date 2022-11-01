@@ -13,14 +13,15 @@ public class ReservationQueryParameters : QueryParameters
 
     public int? Duration { get; set; }
     public int? Guests { get; set; }
+
     [EnumDataType(typeof(SittingType))]
     [JsonConverter(typeof(StringEnumConverter))]
     public Source? Source { get; set; }
+
     [EnumDataType(typeof(SittingType))]
     [JsonConverter(typeof(StringEnumConverter))]
     public State? Status { get; set; }
-    
+
     // SEARCH
     public string Customer { get; set; } = string.Empty;
-
 }

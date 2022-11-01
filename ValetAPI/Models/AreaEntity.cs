@@ -7,6 +7,9 @@ public class AreaEntity
     public string? Description { get; set; }
 
     // size
+    public int Width { get; set; }
+    public int Height { get; set; }
+    
     public int VenueId { get; set; }
     public VenueEntity Venue { get; set; }
     public List<ReservationEntity> Reservations { get; set; } = new();

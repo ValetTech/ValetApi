@@ -11,7 +11,7 @@ public class Area
     [Display(Name = "Area")]
     [StringLength(50, MinimumLength = 2, ErrorMessage = "Please provide a valid Area name.")]
     public string Name { get; set; }
-    
+
     public string Description { get; set; } = string.Empty;
 
     // Tables
@@ -19,8 +19,12 @@ public class Area
 
     [JsonIgnore] public int? TableCapacity { get; set; }
 
+    
 
     // size
+    public int Width { get; set; }
+    public int Height { get; set; }
+    
     public int VenueId { get; set; } = 1;
 
     // public Venue? Venue { get; set; }

@@ -24,7 +24,7 @@ public static class IQueryableExtensions
         var result = Expression.Call(
             typeof(Queryable),
             sortOrder == "desc" ? "OrderByDescending" : "OrderBy",
-            new[] {type, property!.PropertyType},
+            new[] { type, property!.PropertyType },
             items.Expression,
             Expression.Quote(lambda));
 
