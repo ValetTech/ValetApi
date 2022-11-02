@@ -15,4 +15,5 @@ public class AreaEntity
     public List<ReservationEntity> Reservations { get; set; } = new();
     public List<TableEntity> Tables { get; set; } = new();
     public List<AreaSittingEntity> AreaSittings { get; set; } = new();
+    
 }

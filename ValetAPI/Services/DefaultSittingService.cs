@@ -20,7 +20,7 @@ public class DefaultSittingService : ISittingService
     public async Task<IEnumerable<SittingEntity>> GetAllSittingEntitiesAsync()
     {
         if (_context.Sittings == null) return null;
-        return await _context.Sittings.ToArrayAsync();
+        return await _context.Sittings.AsSplitQuery().ToArrayAsync();
     }
 
     public IQueryable<Sitting> GetSittingsAsync()
@@ -30,6 +30,7 @@ public class DefaultSittingService : ISittingService
             .Include(s => s.Reservations)
             .Include(s => s.AreaSittings)
             .ThenInclude(sa => sa.Area)
+            .AsSplitQuery()
             .ProjectTo<Sitting>(_mappingConfiguration).AsQueryable();
     }
 
