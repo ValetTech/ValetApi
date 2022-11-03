@@ -64,6 +64,7 @@ public class DefaultReservationService : IReservationService
             .Include(r => r.Customer)
             .Include(r => r.Tables)
             .Include(r => r.Sitting)
+            .Include(r=>r.Area)
             .Include(r => r.Venue)
             .AsSplitQuery()
             .FirstOrDefaultAsync(r => r.Id == reservationId);
