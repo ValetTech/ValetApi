@@ -167,6 +167,6 @@ public class ApplicationDbContext : IdentityDbContext
         mb.Entity<TableEntity>()
             .HasOne(k => k.Area)
             .WithMany(c => c.Tables)
-            .OnDelete(DeleteBehavior.Restrict);
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
