@@ -21,14 +21,14 @@ public class DefaultCustomerService : ICustomerService
     public async Task<IEnumerable<CustomerEntity>> GetAllCustomerEntitiesAsync()
     {
         if (_context.Customers == null) return null;
-        return await _context.Customers.ToArrayAsync();
+        return await _context.Customers.AsSplitQuery().ToArrayAsync();
     }
 
     public async Task<IQueryable<Customer>> GetCustomersAsync()
     {
         if (_context.Customers == null) 
             throw new HttpResponseException(404, "Customers not found.");
-        return _context.Customers.AsQueryable().ProjectTo<Customer>(_mappingConfiguration);
+        return _context.Customers.AsSplitQuery().AsQueryable().ProjectTo<Customer>(_mappingConfiguration);
     }
 
     public async Task<Customer> GetCustomerAsync(int customerId)

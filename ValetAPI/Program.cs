@@ -1,9 +1,14 @@
+using System.Configuration;
 using System.Reflection;
+using System.Text;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -32,30 +37,90 @@ public static class Program
 
         builder.Services.AddSignalR();
 
-        // Add services to the container.
+        
+        // DATABASE
+        #region DATABASE
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                                throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-
-        // builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        //     options.UseSqlServer(connectionString));
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-
-        //
-        //
-        // var mySqlConnectionString = builder.Configuration.GetConnectionString("MySQLConnection") ??
-        //                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-        // builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        //     options.UseMySql(mySqlConnectionString));
-
-
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+        #endregion
 
-        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
-            .AddEntityFrameworkStores<ApplicationDbContext>();
+
+        
+        // AUTHENTICATION 
+        #region AUTHENICATION
+        builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            .AddRoles<IdentityRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
         builder.Services.AddControllersWithViews();
+
+        builder.Services.AddAuthorization();
+
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.SaveToken = true;
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidAudience = builder.Configuration["JWT:ValidAudience"],
+                ValidIssuer = builder.Configuration["JWT:ValidIssuer"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
+            };
+        });;
+        
+        // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,
+        //         options => builder.Configuration.Bind("JwtSettings", options))
+        //     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme,
+        //         options => builder.Configuration.Bind("CookieSettings", options));
+        
+        // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //     .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAdB2C"));
+        
+        // builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        //     .AddMicrosoftIdentityWebApi(options =>
+        //         {
+        //             builder.Configuration.Bind("AzureAdB2C", options);
+        //
+        //             options.TokenValidationParameters.NameClaimType = "name";
+        //         },
+        //         options => { builder.Configuration.Bind("AzureAdB2C", options); });
+        
+        // builder.Services.AddAuthentication("Bearer")
+        //     .AddJwtBearer("Bearer", options =>
+        //     {
+        //         options.Authority = "https://localhost:5001";
+        //
+        //         options.Audience = "scope1";
+        //
+        //         options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters()
+        //         {
+        //             ValidateAudience = false
+        //         };
+        //
+        //     });
+
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowMyApp", policy => policy.AllowAnyOrigin());
+            // options.AddPolicy("AllowMyApp", policy => policy.WithOrigins("https://example.com"));
+        });
+        #endregion
+        
+       
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -73,43 +138,43 @@ public static class Program
                 options.Filters.Add<HttpResponseExceptionFilter>();
             }
             );
-        
-        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddRouting(options => options.LowercaseUrls = true);
+
+        // API
+
+        #region API
+
         builder.Services.AddSwaggerGen(options =>
         {
-            options.SwaggerDoc("v1", new OpenApiInfo {Title = "ValetAPI", Version = "v1"});
+            options.ResolveConflictingActions((apiDescriptions )=>apiDescriptions.First());
+            options.SwaggerDoc("v1", new OpenApiInfo {Title = "ValetAPI", Version = "v1", Description = "Version 1 of Valet API"});
+            options.SwaggerDoc("v2", new OpenApiInfo {Title = "ValetAPI", Version = "v2", Description = "Version 2 of Valet API"});
             options.SchemaFilter<SwaggerSchemaFilter>();
             var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+            
         });
         builder.Services.AddSwaggerGenNewtonsoftSupport();
 
-        builder.Services.AddRouting(options => options.LowercaseUrls = true);
         builder.Services.AddApiVersioning(options =>
         {
-            options.DefaultApiVersion = new ApiVersion(1, 0);
-            options.ApiVersionReader = new MediaTypeApiVersionReader();
-            // options.ApiVersionReader = new UrlSegmentApiVersionReader();
-            options.AssumeDefaultVersionWhenUnspecified = true;
             options.ReportApiVersions = true;
-            options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
+
+            options.DefaultApiVersion = new ApiVersion(1,0);
+
+            options.AssumeDefaultVersionWhenUnspecified = true;
+            // options.ApiVersionReader = new UrlSegmentApiVersionReader();
+            options.ApiVersionReader = ApiVersionReader.Combine(
+                new QueryStringApiVersionReader("api-version"),
+                new HeaderApiVersionReader("X-Version"),
+                new MediaTypeApiVersionReader("ver"));
+            options.ApiVersionSelector = new DefaultApiVersionSelector(options);
+            // options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
         });
+        
+        builder.Services.AddEndpointsApiExplorer();
 
-        builder.Services.AddAutoMapper(options => options.AddProfile<MapperProfile>());
-
-
-        builder.Services.AddCors(options =>
-        {
-            options.AddPolicy("AllowMyApp", policy => policy.AllowAnyOrigin());
-            // options.AddPolicy("AllowMyApp", policy => policy.WithOrigins("https://example.com"));
-        });
-
-        builder.Services.AddScoped<IAreaService, DefaultAreaService>();
-        builder.Services.AddScoped<ICustomerService, DefaultCustomerService>();
-        builder.Services.AddScoped<IReservationService, DefaultReservationService>();
-        builder.Services.AddScoped<ISittingService, DefaultSittingService>();
-        builder.Services.AddScoped<ITableService, DefaultTableService>();
-        builder.Services.AddScoped<IVenueService, DefaultVenueService>();
+        
 
         builder.Services.Configure<ApiBehaviorOptions>(options =>
         {
@@ -119,19 +184,38 @@ public static class Program
                 return new BadRequestObjectResult(errorResponse);
             };
         });
+        #endregion
+        
+        
+
+        builder.Services.AddAutoMapper(options => options.AddProfile<MapperProfile>());
+        
+        builder.Services.AddScoped<IAreaService, DefaultAreaService>();
+        builder.Services.AddScoped<ICustomerService, DefaultCustomerService>();
+        builder.Services.AddScoped<IReservationService, DefaultReservationService>();
+        builder.Services.AddScoped<ISittingService, DefaultSittingService>();
+        builder.Services.AddScoped<ITableService, DefaultTableService>();
+        builder.Services.AddScoped<IVenueService, DefaultVenueService>();
+
 
         var app = builder.Build();
 
         app.UseDefaultFiles();
         app.UseStaticFiles();
+        
+        app.UseRouting();
+
 
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
+            app.MapSwagger();
+            app.UseDeveloperExceptionPage();
             app.UseMigrationsEndPoint();
             app.UseSwagger();
             app.UseSwaggerUI();
+
         }
         else
         {
@@ -140,38 +224,36 @@ public static class Program
             app.UseHsts();
         }
 
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseCors("AllowMyApp");
-
 
         app.UseHttpsRedirection();
 
 
-        app.UseRouting();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
-
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllerRoute(
-                "areas",
-                "{area:exists}/{controller=Home}/{action=Index}/{id?}");
-
-            endpoints.MapControllerRoute(
-                "default",
-                "{controller=Home}/{action=Index}/{id?}");
+                name : "areas",
+                pattern : "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+            );
         });
 
 
         app.MapRazorPages();
         app.UseSwaggerUI(options =>
         {
-            options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
-            options.RoutePrefix = string.Empty;
+            options.SwaggerEndpoint("swagger/v1/swagger.json", "v1");
+            options.SwaggerEndpoint("swagger/v2/swagger.json", "v2");
+            options.RoutePrefix = "";
             options.DefaultModelExpandDepth(-1);
-            options.InjectStylesheet("/swagger-ui/SwaggerDark.css");
+            options.InjectStylesheet("../swagger-ui/SwaggerDark.css");
+
         });
-        app.UseSwagger(options => { options.SerializeAsV2 = true; });
+        app.UseSwagger(options =>
+        {
+            options.SerializeAsV2 = true;
+        });
 
         app.MapControllers();
 
