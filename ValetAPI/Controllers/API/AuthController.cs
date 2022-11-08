@@ -11,7 +11,7 @@ namespace ValetAPI.Controllers.API;
 /// <summary>
 /// 
 /// </summary>
-[Route("auth")]
+[Route("api/auth")]
 [ApiVersion("1.0")]
 [ApiVersion("2.0")]
 [ApiController]
@@ -54,7 +54,7 @@ public class AuthController : ControllerBase
 
             var authClaims = new List<Claim>
             {
-                new(ClaimTypes.Name, user.Email),
+                new(ClaimTypes.Email, user.Email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
