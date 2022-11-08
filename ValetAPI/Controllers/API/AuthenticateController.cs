@@ -12,6 +12,8 @@ namespace ValetAPI.Controllers.API;
 /// 
 /// </summary>
 [Route("api/[controller]")]
+[ApiVersion("1.0")]
+[ApiVersion("2.0")]
 [ApiController]
 public class AuthenticateController : ControllerBase
 {
@@ -35,18 +37,24 @@ public class AuthenticateController : ControllerBase
         _configuration = configuration;
     }
 
+    
+    /// <summary>
+    /// Login
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     [Route("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
-        var user = await _userManager.FindByNameAsync(model.Username);
+        var user = await _userManager.FindByEmailAsync(model.Email);
         if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
         {
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
             {
-                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Name, user.Email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -64,11 +72,16 @@ public class AuthenticateController : ControllerBase
         return Unauthorized();
     }
 
+    /// <summary>
+    /// Register a new user
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var userExists = await _userManager.FindByNameAsync(model.Username);
+        var userExists = await _userManager.FindByEmailAsync(model.Email);
         if (userExists != null)
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new Response {Status = "Error", Message = "User already exists!"});
@@ -88,11 +101,16 @@ public class AuthenticateController : ControllerBase
         return Ok(new Response {Status = "Success", Message = "User created successfully!"});
     }
 
+    /// <summary>
+    /// Register a new admin
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
     [HttpPost]
     [Route("register-admin")]
     public async Task<IActionResult> RegisterAdmin([FromBody] RegisterModel model)
     {
-        var userExists = await _userManager.FindByNameAsync(model.Username);
+        var userExists = await _userManager.FindByEmailAsync(model.Email);
         if (userExists != null)
             return StatusCode(StatusCodes.Status500InternalServerError,
                 new Response {Status = "Error", Message = "User already exists!"});
@@ -128,7 +146,7 @@ public class AuthenticateController : ControllerBase
         var token = new JwtSecurityToken(
             _configuration["JWT:ValidIssuer"],
             _configuration["JWT:ValidAudience"],
-            expires: DateTime.Now.AddHours(3),
+            expires: DateTime.Now.AddDays(1),
             claims: authClaims,
             signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
         );
