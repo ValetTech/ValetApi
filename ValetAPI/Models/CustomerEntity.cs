@@ -11,6 +11,7 @@ public class CustomerEntity
     public string Email { get; set; }
     public string? Phone { get; set; }
     public List<ReservationEntity> Reservations { get; set; } = new();
+    public bool IsVip { get; set; } = false;
 
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     [Display(Name = "Name")]

@@ -10,9 +10,8 @@ namespace ValetAPI.Controllers.API;
 /// <summary>
 ///     Sittings controller v1
 /// </summary>
-[Authorize]
 [ApiVersion("1.0")]
-[Route("api/sittigns")]
+[Route("api/sittings")]
 [ApiController]
 public class SittingsV1Controller : ControllerBase
 {
@@ -288,7 +287,7 @@ public class SittingsV1Controller : ControllerBase
 /// </summary>
 [Authorize]
 [ApiVersion("2.0")]
-[Route("api/sittigns")]
+[Route("api/sittings")]
 [ApiController]
 public class SittingsV2Controller : ControllerBase
 {

@@ -49,11 +49,16 @@ public class ReservationsV1Controller : ControllerBase
             reservations = reservations.Where(r => r.DateTime <= queryParameters.MaxDate.Value);
 
         if (queryParameters.Date.HasValue)
-            reservations = reservations.Where(r => r.DateTime.Date == queryParameters.Date.Value.Date);
+        {
+            var date = queryParameters.Date.Value;
+            if (date.Kind == DateTimeKind.Unspecified)
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            reservations = reservations.Where(r => r.DateTime.Date == date);
+        }
 
         if (queryParameters.Duration.HasValue)
             reservations = reservations.Where(r => r.Duration == queryParameters.Duration);
-        
+
         if (queryParameters.Guests.HasValue)
             reservations = reservations.Where(r => r.NoGuests == queryParameters.Guests);
         
@@ -342,7 +347,12 @@ public class ReservationsV2Controller : ControllerBase
             reservations = reservations.Where(r => r.DateTime <= queryParameters.MaxDate.Value);
 
         if (queryParameters.Date.HasValue)
-            reservations = reservations.Where(r => r.DateTime.Date == queryParameters.Date.Value.Date);
+        {
+            var date = queryParameters.Date.Value;
+            if (date.Kind == DateTimeKind.Unspecified)
+                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
+            reservations = reservations.Where(r => r.DateTime.Date == date);
+        }
 
         if (queryParameters.Duration.HasValue)
             reservations = reservations.Where(r => r.Duration == queryParameters.Duration);
@@ -355,6 +365,16 @@ public class ReservationsV2Controller : ControllerBase
         
         if (queryParameters.Status.HasValue)
             reservations = reservations.Where(r => r.Status == queryParameters.Status);
+        
+        if (queryParameters.Area.Length > 0)
+        {
+            reservations = reservations.Where(r => r.Area != null && queryParameters.Area.Contains(r.Area.Name));
+        }
+        
+        if (queryParameters.Sitting.Length > 0)
+        {
+            reservations = reservations.Where(r => r.Sitting != null && queryParameters.Area.Contains(r.Sitting.Type.ToString()));
+        }
         
         
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))

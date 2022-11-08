@@ -21,12 +21,15 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<CustomerEntity> Customers { get; set; }
     public DbSet<AreaSittingEntity> AreaSittings { get; set; }
     public DbSet<SittingTypeEntity> SittingTypes { get; set; }
+    public DbSet<ReservationTables> ReservationTable { get; set; }
     public DbSet<StateEntity> States { get; set; }
     public DbSet<SourceEntity> Sources { get; set; }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
+        
+        
         
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),

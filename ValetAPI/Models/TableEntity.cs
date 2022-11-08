@@ -15,5 +15,5 @@ public class TableEntity
     public int AreaId { get; set; }
     public AreaEntity? Area { get; set; }
     public int? ReservationId { get; set; }
-    public ReservationEntity? Reservation { get; set; }
+    public List<ReservationEntity>? Reservations { get; set; } = new();
 }
