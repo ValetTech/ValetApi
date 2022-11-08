@@ -237,12 +237,14 @@ public class CustomersV2Controller : ControllerBase
         query.Append($"{queryParameters.Email} "); // Email
         query.Append($"{queryParameters.Phone} "); // Phone
         query.Append($"{queryParameters.hasReservations} "); // HasReservations
-        query.Append($"{queryParameters.Name} "); // Name
+        query.Append($"{queryParameters.Name}"); // Name
 
 
-        var customers =
-            _context.Customers.FromSqlRaw(query.ToString());
+        // var customers =
+        //     _context.Customers.FromSqlRaw(query.ToString()).AsQueryable();
             
+        var customers =
+            _context.Customers.FromSqlRaw("Select * From Customers").AsQueryable();
         
         
         // if (!string.IsNullOrEmpty(queryParameters.SearchTerm))

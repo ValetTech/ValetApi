@@ -11,11 +11,11 @@ namespace ValetAPI.Controllers.API;
 /// <summary>
 /// 
 /// </summary>
-[Route("api/[controller]")]
+[Route("auth")]
 [ApiVersion("1.0")]
 [ApiVersion("2.0")]
 [ApiController]
-public class AuthenticateController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
     private readonly RoleManager<IdentityRole> _roleManager;
@@ -27,7 +27,7 @@ public class AuthenticateController : ControllerBase
     /// <param name="userManager"></param>
     /// <param name="roleManager"></param>
     /// <param name="configuration"></param>
-    public AuthenticateController(
+    public AuthController(
         UserManager<IdentityUser> userManager,
         RoleManager<IdentityRole> roleManager,
         IConfiguration configuration)
