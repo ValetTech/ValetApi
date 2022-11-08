@@ -7,6 +7,7 @@ public static class DbSeeder
 {
     public static void Seed(this ModelBuilder modelBuilder)
     {
+        
         var venues = new List<VenueEntity>
         {
             new() {Id = 1, Name = "Saki", Address = "123 George St"}

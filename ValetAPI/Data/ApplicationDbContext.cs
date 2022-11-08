@@ -21,12 +21,15 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<CustomerEntity> Customers { get; set; }
     public DbSet<AreaSittingEntity> AreaSittings { get; set; }
     public DbSet<SittingTypeEntity> SittingTypes { get; set; }
+    public DbSet<ReservationTables> ReservationTable { get; set; }
     public DbSet<StateEntity> States { get; set; }
     public DbSet<SourceEntity> Sources { get; set; }
 
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
+        
+        
         
         var dateTimeConverter = new ValueConverter<DateTime, DateTime>(
             v => v.ToUniversalTime(),
@@ -149,6 +152,16 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .WithMany(c => c.AreaSittings)
             .HasForeignKey(bc => bc.SittingId);
 
+        mb.Entity<ReservationTables>()
+            .HasKey(a => new {a.ReservationId, a.TableId});
+        // mb.Entity<ReservationTables>()
+        //     .HasOne(rt => rt.Table)
+        //     .WithMany(b => b.Reservations)
+        //     .HasForeignKey(rt => rt.AreaId);
+        // mb.Entity<ReservationTables>()
+        //     .HasOne(rt => rt.Sitting)
+        //     .WithMany(c => c.AreaSittings)
+        //     .HasForeignKey(rt => rt.SittingId);
 
         // mb.Entity<SittingEntity>()
         //     .HasOne(k => k.AreaEntity)
