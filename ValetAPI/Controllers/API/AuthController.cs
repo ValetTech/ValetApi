@@ -54,6 +54,7 @@ public class AuthController : ControllerBase
 
             var authClaims = new List<Claim>
             {
+                new(ClaimTypes.Name, user.UserName),
                 new(ClaimTypes.Email, user.Email),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
@@ -64,6 +65,7 @@ public class AuthController : ControllerBase
 
             return Ok(new
             {
+                // email = user.Email,
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo
             });
