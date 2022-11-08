@@ -152,6 +152,16 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .WithMany(c => c.AreaSittings)
             .HasForeignKey(bc => bc.SittingId);
 
+        mb.Entity<ReservationTables>()
+            .HasKey(a => new {a.ReservationId, a.TableId});
+        // mb.Entity<ReservationTables>()
+        //     .HasOne(rt => rt.Table)
+        //     .WithMany(b => b.Reservations)
+        //     .HasForeignKey(rt => rt.AreaId);
+        // mb.Entity<ReservationTables>()
+        //     .HasOne(rt => rt.Sitting)
+        //     .WithMany(c => c.AreaSittings)
+        //     .HasForeignKey(rt => rt.SittingId);
 
         // mb.Entity<SittingEntity>()
         //     .HasOne(k => k.AreaEntity)

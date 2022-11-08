@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ValetAPI.Data;
 using ValetAPI.Models;
 using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
@@ -202,16 +204,18 @@ public class CustomersV2Controller : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
+    private readonly ApplicationDbContext _context;
 
 
     /// <summary>
     ///     Customer controllers constructor
     /// </summary>
     /// <param name="customerService"></param>
-    public CustomersV2Controller(ICustomerService customerService, AutoMapper.IConfigurationProvider mappingConfiguration)
+    public CustomersV2Controller(ICustomerService customerService, AutoMapper.IConfigurationProvider mappingConfiguration, ApplicationDbContext context)
     {
         _customerService = customerService;
         _mappingConfiguration = mappingConfiguration;
+        _context = context;
     }
 
     /// <summary>
@@ -225,30 +229,32 @@ public class CustomersV2Controller : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers([FromQuery] CustomerQueryParameters queryParameters)
     {
-        var customers = await _customerService.GetCustomersAsync();
-        
-        if (queryParameters.isVip.HasValue)
-        {
-            customers = customers.Where(c =>
-                c.IsVip == queryParameters.isVip.Value);
-        }
-        
-        if (queryParameters.hasReservations.HasValue)
-        {
-            customers = customers.Where(c =>
-                c.Reservations.Any() == queryParameters.hasReservations.Value);
-        }
+        var query = new StringBuilder();
+        query.Append("EXECUTE dbo.GetCustomers ");
+        query.Append($"{queryParameters.Id} "); // ID
+        query.Append($"{queryParameters.FirstName} "); // FirstName
+        query.Append($"{queryParameters.LastName} "); // LastName
+        query.Append($"{queryParameters.Email} "); // Email
+        query.Append($"{queryParameters.Phone} "); // Phone
+        query.Append($"{queryParameters.hasReservations} "); // HasReservations
+        query.Append($"{queryParameters.Name} "); // Name
 
-        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
-            customers = customers.Where(a =>
-                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())
-            );
-        }
+
+        var customers =
+            _context.Customers.FromSqlRaw(query.ToString());
+            
+        
+        
+        // if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        // {
+        //     customers = customers.Where(a =>
+        //         a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
+        //         a.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+        //         a.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+        //         a.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+        //         a.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())
+        //     );
+        // }
 
         
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
