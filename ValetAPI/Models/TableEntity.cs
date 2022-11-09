@@ -11,9 +11,8 @@ public class TableEntity
     public int yPosition { get; set; }
 
     public int Capacity { get; set; }
-    public int VenueId { get; set; }
+    public int? VenueId { get; set; }
     public int AreaId { get; set; }
     public AreaEntity? Area { get; set; }
-    public int? ReservationId { get; set; }
-    public List<ReservationEntity>? Reservations { get; set; } = new();
+    public List<ReservationTable>? ReservationTables { get; set; } = new();
 }

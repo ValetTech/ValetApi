@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using ValetAPI.Data;
 using ValetAPI.Models;
 using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace ValetAPI.Controllers.API;
 
@@ -19,14 +21,14 @@ namespace ValetAPI.Controllers.API;
 public class CustomersV1Controller : ControllerBase
 {
     private readonly ICustomerService _customerService;
-    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
+    private readonly IConfigurationProvider _mappingConfiguration;
 
 
     /// <summary>
     ///     Customer controllers constructor
     /// </summary>
     /// <param name="customerService"></param>
-    public CustomersV1Controller(ICustomerService customerService, AutoMapper.IConfigurationProvider mappingConfiguration)
+    public CustomersV1Controller(ICustomerService customerService, IConfigurationProvider mappingConfiguration)
     {
         _customerService = customerService;
         _mappingConfiguration = mappingConfiguration;
@@ -41,65 +43,56 @@ public class CustomersV1Controller : ControllerBase
     [HttpGet("", Name = nameof(GetCustomers))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers([FromQuery] CustomerQueryParameters queryParameters)
+    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers(
+        [FromQuery] CustomerQueryParameters queryParameters)
     {
         var customers = await _customerService.GetCustomersAsync();
-        
+
         if (queryParameters.isVip.HasValue)
-        {
             customers = customers.Where(c =>
                 c.IsVip == queryParameters.isVip.Value);
-        }
-        
+
         if (queryParameters.hasReservations.HasValue)
-        {
             customers = customers.Where(c =>
                 c.Reservations.Any() == queryParameters.hasReservations.Value);
-        }
 
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
             customers = customers.Where(a =>
-                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
+                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) ||
+                a.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+                a.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+                a.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
                 a.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())
             );
-        }
 
-        
+
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
             if (typeof(Customer).GetProperty(queryParameters.SortBy) != null)
-            {
                 customers = customers.OrderByCustom(
                     queryParameters.SortBy,
                     queryParameters.SortOrder);
-            }
-        }
-        
+
         customers = customers
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
             .Take(queryParameters.Size);
 
 
         var mapper = _mappingConfiguration.CreateMapper();
-         var customersDto = customers.Select(c => new {
-             c.Id,
-             c.FirstName,
-             c.LastName,
-             c.Email,
-             c.Phone,
-             c.IsVip,
-             c.FullName,
-             Reservations = mapper.Map<Models.DTO.Reservation[]>(c.Reservations)
+        var customersDto = customers.Select(c => new
+        {
+            c.Id,
+            c.FirstName,
+            c.LastName,
+            c.Email,
+            c.Phone,
+            c.IsVip,
+            c.FullName,
+            Reservations = mapper.Map<Models.DTO.Reservation[]>(c.Reservations)
         });
-        
+
 
         // Outta left join
-        return Ok(new {customers = await customersDto.ToArrayAsync()});
-        
+        return Ok(new { customers = await customersDto.ToArrayAsync() });
     }
 
     /// <summary>
@@ -133,7 +126,7 @@ public class CustomersV1Controller : ControllerBase
     {
         var id = await _customerService.CreateCustomerAsync(customer);
         var entity = await _customerService.GetCustomerAsync(id);
-        return CreatedAtAction($"GetCustomer",new { id = entity.Id }, entity);
+        return CreatedAtAction("GetCustomer", new { id = entity.Id }, entity);
     }
 
 
@@ -191,7 +184,6 @@ public class CustomersV1Controller : ControllerBase
     }
 }
 
-
 /// <summary>
 ///     Customers endpoint v2
 /// </summary>
@@ -202,16 +194,17 @@ public class CustomersV1Controller : ControllerBase
 [Produces("application/json")]
 public class CustomersV2Controller : ControllerBase
 {
-    private readonly ICustomerService _customerService;
-    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
     private readonly ApplicationDbContext _context;
+    private readonly ICustomerService _customerService;
+    private readonly IConfigurationProvider _mappingConfiguration;
 
 
     /// <summary>
     ///     Customer controllers constructor
     /// </summary>
     /// <param name="customerService"></param>
-    public CustomersV2Controller(ICustomerService customerService, AutoMapper.IConfigurationProvider mappingConfiguration, ApplicationDbContext context)
+    public CustomersV2Controller(ICustomerService customerService, IConfigurationProvider mappingConfiguration,
+        ApplicationDbContext context)
     {
         _customerService = customerService;
         _mappingConfiguration = mappingConfiguration;
@@ -227,69 +220,65 @@ public class CustomersV2Controller : ControllerBase
     [HttpGet("", Name = nameof(GetCustomers))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers([FromQuery] CustomerQueryParameters queryParameters)
+    public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers(
+        [FromQuery] CustomerQueryParameters queryParameters)
     {
-        var query = new StringBuilder();
-        query.Append("EXECUTE dbo.GetCustomers ");
-        query.Append($"{queryParameters.Id} "); // ID
-        query.Append($"{queryParameters.FirstName} "); // FirstName
-        query.Append($"{queryParameters.LastName} "); // LastName
-        query.Append($"{queryParameters.Email} "); // Email
-        query.Append($"{queryParameters.Phone} "); // Phone
-        query.Append($"{queryParameters.hasReservations} "); // HasReservations
-        query.Append($"{queryParameters.Name}"); // Name
 
+        var queryString = $"EXECUTE dbo.GetCustomers ";
+        if (queryParameters.Id.HasValue) 
+            queryString += $"@Id = {queryParameters.Id.Value}, "; // ID
+        queryString += $"@FirstName = {queryParameters.FirstName ?? "null"}, "; // FirstName
+        queryString += $"@LastName = {queryParameters.LastName ?? "null"}, "; // LastName
+        queryString += $"@Email = {queryParameters.Email ?? "null"}, "; // Email
+        queryString += $"@Phone = {queryParameters.Phone ?? "null"}, "; // Phone
+        if (queryParameters.hasReservations.HasValue) 
+            queryString += $"@HasReservations = {queryParameters.hasReservations.Value}, "; // HasReservations
+        queryString += $"@Name = {queryParameters.Name ?? "null"}, "; // Name
+        if (queryParameters.isVip.HasValue) 
+            queryString += $"@IsVip = {queryParameters.isVip.Value}, "; // IsVip
+        queryString += $"@Page = {queryParameters.Page}, "; // Page
+        queryString += $"@Limit = {queryParameters.Size}, "; // Size
+        if (typeof(Customer).GetProperty(queryParameters.SortBy) != null)
+            queryString += $"@OrderBy = {queryParameters.SortBy}, "; // orderBy
+        queryString += $"@OrderByAsc = {(queryParameters.SortOrder.ToLower() == "asc" ? 1 : 0)} "; // orderByAsc
 
-        // var customers =
-        //     _context.Customers.FromSqlRaw(query.ToString()).AsQueryable();
-            
         var customers =
-            _context.Customers.FromSqlRaw("Select * From Customers").AsQueryable();
-        
-        
-        // if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        // {
-        //     customers = customers.Where(a =>
-        //         a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
-        //         a.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-        //         a.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-        //         a.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-        //         a.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())
-        //     );
-        // }
+             _context.Customers
+                 .FromSqlRaw<CustomerEntity>(queryString)
+                .ToList<CustomerEntity>()
+                 
+                // .Include(c=>c.Reservations)
+                 // .AsEnumerable()
+         ;
 
+        var reservations = await _context.Reservations
+            .FromSqlInterpolated($"EXECUTE GetReservationsForCustomer")
+            .AsNoTracking()
+            .ToListAsync();
         
-        if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
-            if (typeof(Customer).GetProperty(queryParameters.SortBy) != null)
-            {
-                customers = customers.OrderByCustom(
-                    queryParameters.SortBy,
-                    queryParameters.SortOrder);
-            }
-        }
+        Parallel.ForEach(customers, customer=>
+            customer.Reservations = reservations.Where(r=>r.CustomerId == customer.Id).ToList());
         
-        customers = customers
-            .Skip(queryParameters.Size * (queryParameters.Page - 1))
-            .Take(queryParameters.Size);
+       
 
 
         var mapper = _mappingConfiguration.CreateMapper();
-         var customersDto = customers.Select(c => new {
-             c.Id,
-             c.FirstName,
-             c.LastName,
-             c.Email,
-             c.Phone,
-             c.IsVip,
-             c.FullName,
-             Reservations = mapper.Map<Models.DTO.Reservation[]>(c.Reservations)
+        var customersDto = customers.Select(c => new
+        {
+            c.Id,
+            c.FirstName,
+            c.LastName,
+            c.Email,
+            c.Phone,
+            c.IsVip,
+            c.FullName,
+            c.Reservations
+            // Reservations = mapper.Map<Models.DTO.Reservation[]>(c.Reservations)
         });
-        
+
 
         // Outta left join
-        return Ok(new {customers = await customersDto.ToArrayAsync()});
-        
+        return Ok(new { customers = customersDto });
     }
 
     /// <summary>
@@ -323,7 +312,7 @@ public class CustomersV2Controller : ControllerBase
     {
         var id = await _customerService.CreateCustomerAsync(customer);
         var entity = await _customerService.GetCustomerAsync(id);
-        return CreatedAtAction($"GetCustomer",new { id = entity.Id }, entity);
+        return CreatedAtAction("GetCustomer", new { id = entity.Id }, entity);
     }
 
 
@@ -376,8 +365,19 @@ public class CustomersV2Controller : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<IEnumerable<Reservation>>> GetReservationsForCustomer(int id)
     {
-        var reservations = await _customerService.GetReservationsAsync(id);
-        if (reservations == null) return NotFound();
-        return Ok(reservations);
+        var reservationEntities = await _context.Reservations
+            .FromSqlInterpolated($"SELECT * FROM Reservations r WHERE r.CustomerId = {id}")
+            .Include(r=>r.Area)
+            .Include(r=>r.Customer)
+            .Include(r=>r.Sitting)
+            .Include(r=>r.ReservationTables)
+            .ThenInclude(rt=>rt.Table)
+            .ToListAsync();
+        
+        var mapper = _mappingConfiguration.CreateMapper();
+        var reservations = mapper.Map<Reservation[]>(reservationEntities);
+        // var reservations = await _customerService.GetReservationsAsync(id);
+        // if (reservations == null) return NotFound();
+        return Ok(new {reservations = reservations});
     }
 }

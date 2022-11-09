@@ -1,10 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ValetAPI.Data;
 using ValetAPI.Models;
 using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
+using Area = ValetAPI.Models.DTO.Area;
+using Customer = ValetAPI.Models.DTO.Customer;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
+using Sitting = ValetAPI.Models.DTO.Sitting;
 
 namespace ValetAPI.Controllers.API;
 
@@ -16,8 +20,8 @@ namespace ValetAPI.Controllers.API;
 [ApiController]
 public class ReservationsV1Controller : ControllerBase
 {
-    private readonly IReservationService _reservationService;
     private readonly IConfigurationProvider _mappingConfiguration;
+    private readonly IReservationService _reservationService;
 
     /// <summary>
     ///     Reservations constructor
@@ -61,63 +65,54 @@ public class ReservationsV1Controller : ControllerBase
 
         if (queryParameters.Guests.HasValue)
             reservations = reservations.Where(r => r.NoGuests == queryParameters.Guests);
-        
+
         if (queryParameters.Source.HasValue)
             reservations = reservations.Where(r => r.Source == queryParameters.Source);
-        
+
         if (queryParameters.Status.HasValue)
             reservations = reservations.Where(r => r.Status == queryParameters.Status);
-        
-        
+
+
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
-            
             reservations = reservations.Where(a =>
-                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer != null && (
-                a.Customer.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower()))
+                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) ||
+                (a.Customer != null && (
+                    a.Customer.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+                    a.Customer.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+                    a.Customer.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+                    a.Customer.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())))
             );
-        }
-        
+
         if (!string.IsNullOrEmpty(queryParameters.Customer))
-        {
-            
             reservations = reservations.Where(a =>
-                a.Id.ToString().Contains(queryParameters.Customer.ToLower()) || 
-                a.Customer != null && (
-                    a.Customer.FirstName.ToLower().Contains(queryParameters.Customer.ToLower()) || 
-                    a.Customer.LastName.ToLower().Contains(queryParameters.Customer.ToLower()) || 
-                    a.Customer.Email.ToLower().Contains(queryParameters.Customer.ToLower()) || 
-                    a.Customer.Phone.ToLower().Contains(queryParameters.Customer.ToLower()))
+                a.Id.ToString().Contains(queryParameters.Customer.ToLower()) ||
+                (a.Customer != null && (
+                    a.Customer.FirstName.ToLower().Contains(queryParameters.Customer.ToLower()) ||
+                    a.Customer.LastName.ToLower().Contains(queryParameters.Customer.ToLower()) ||
+                    a.Customer.Email.ToLower().Contains(queryParameters.Customer.ToLower()) ||
+                    a.Customer.Phone.ToLower().Contains(queryParameters.Customer.ToLower())))
             );
-        }
-        
+
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
             if (typeof(Reservation).GetProperty(queryParameters.SortBy) != null)
-            {
                 reservations = reservations.OrderByCustom(
                     queryParameters.SortBy,
                     queryParameters.SortOrder);
-            }
-        }
 
         reservations = reservations
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
             .Take(queryParameters.Size);
 
         var mapper = _mappingConfiguration.CreateMapper();
-        var reservationsDto = reservations.Select(r => new {
+        var reservationsDto = reservations.Select(r => new
+        {
             r.Id,
             r.CustomerId,
-            Customer = mapper.Map<Models.DTO.Customer>(r.Customer),
+            Customer = mapper.Map<Customer>(r.Customer),
             r.SittingId,
-            Sitting = mapper.Map<Models.DTO.Sitting>(r.Sitting),
+            Sitting = mapper.Map<Sitting>(r.Sitting),
             r.AreaId,
-            Area = mapper.Map<Models.DTO.Area>(r.Area),
+            Area = mapper.Map<Area>(r.Area),
             r.DateTime,
             r.Duration,
             r.NoGuests,
@@ -127,7 +122,7 @@ public class ReservationsV1Controller : ControllerBase
             r.Tables
         });
 
-        return Ok(new {reservations = await reservationsDto.ToArrayAsync()});
+        return Ok(new { reservations = await reservationsDto.ToArrayAsync() });
     }
 
     /// <summary>
@@ -235,8 +230,7 @@ public class ReservationsV1Controller : ControllerBase
     {
         // if (id != reservation.Id) return BadRequest();
 
-        var table = await _reservationService.AddTableToReservation(id, tableId);
-        if (!table) return BadRequest();
+        await _reservationService.AddTableToReservation(id, tableId);
         return NoContent();
     }
 
@@ -314,17 +308,20 @@ public class ReservationsV1Controller : ControllerBase
 [ApiController]
 public class ReservationsV2Controller : ControllerBase
 {
-    private readonly IReservationService _reservationService;
+    private readonly ApplicationDbContext _context;
     private readonly IConfigurationProvider _mappingConfiguration;
+    private readonly IReservationService _reservationService;
 
     /// <summary>
     ///     Reservations constructor
     /// </summary>
     /// <param name="reservationService"></param>
-    public ReservationsV2Controller(IReservationService reservationService, IConfigurationProvider mappingConfiguration)
+    public ReservationsV2Controller(IReservationService reservationService, IConfigurationProvider mappingConfiguration,
+        ApplicationDbContext context)
     {
         _reservationService = reservationService;
         _mappingConfiguration = mappingConfiguration;
+        _context = context;
     }
 
     /// <summary>
@@ -338,104 +335,146 @@ public class ReservationsV2Controller : ControllerBase
         [FromQuery] ReservationQueryParameters queryParameters)
     {
         //YYYY-MM-DDTHH:MM:SS
-        var reservations = await _reservationService.GetReservationsAsync();
 
-        if (queryParameters.MinDate.HasValue)
-            reservations = reservations.Where(r => r.DateTime >= queryParameters.MinDate.Value);
-
-        if (queryParameters.MaxDate.HasValue)
-            reservations = reservations.Where(r => r.DateTime <= queryParameters.MaxDate.Value);
-
-        if (queryParameters.Date.HasValue)
-        {
-            var date = queryParameters.Date.Value;
-            if (date.Kind == DateTimeKind.Unspecified)
-                date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-            reservations = reservations.Where(r => r.DateTime.Date == date);
-        }
-
-        if (queryParameters.Duration.HasValue)
-            reservations = reservations.Where(r => r.Duration == queryParameters.Duration);
-        
-        if (queryParameters.Guests.HasValue)
-            reservations = reservations.Where(r => r.NoGuests == queryParameters.Guests);
-        
-        if (queryParameters.Source.HasValue)
-            reservations = reservations.Where(r => r.Source == queryParameters.Source);
-        
-        if (queryParameters.Status.HasValue)
-            reservations = reservations.Where(r => r.Status == queryParameters.Status);
-        
-        if (queryParameters.Area.Length > 0)
-        {
-            reservations = reservations.Where(r => r.Area != null && queryParameters.Area.Contains(r.Area.Name));
-        }
-        
-        if (queryParameters.Sitting.Length > 0)
-        {
-            reservations = reservations.Where(r => r.Sitting != null && queryParameters.Area.Contains(r.Sitting.Type.ToString()));
-        }
-        
-        
-        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
+            var queryString = $"EXECUTE dbo.GetReservations ";
+            if (queryParameters.MinDate.HasValue) 
+                queryString += $"@MinDate = {queryParameters.MinDate.Value}, "; // MinDate
+            if (queryParameters.MaxDate.HasValue) 
+                queryString += $"@MaxDate = {queryParameters.MaxDate.Value}, "; // MaxDate
+            if (queryParameters.Date.HasValue) 
+                queryString += $"@Date = {queryParameters.Date.Value}, "; // Date
+            if (queryParameters.Duration.HasValue) 
+                queryString += $"@Duration = {queryParameters.Duration.Value}, "; // Duration
+            if (queryParameters.Guests.HasValue) 
+                queryString += $"@Guests = {queryParameters.Guests.Value}, "; // Guests
+            queryString += $"@Id = {queryParameters.Id ?? "null"}, "; // Id
+            queryString += $"@CustomerId = {queryParameters.CustomerId ?? "null"}, "; // CustomerId
+            queryString += $"@SittingId = {queryParameters.SittingId ?? "null"}, "; // SittingId
+            if (queryParameters.Source.HasValue) 
+            queryString += $"@Source = {queryParameters.Source}, "; // Source
+            if (queryParameters.Status.HasValue) 
+                queryString += $"@Status = {queryParameters.Status}, "; // Status
+            queryString += $"@Customer = {queryParameters.Customer ?? "null"}, "; // Customer
+             if (queryParameters.hasTables.HasValue) 
+                 queryString += $"@hasTables = {queryParameters.hasTables.Value}, "; // hasTables
             
-            reservations = reservations.Where(a =>
-                a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer != null && (
-                a.Customer.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) || 
-                a.Customer.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower()))
-            );
-        }
-        
-        if (!string.IsNullOrEmpty(queryParameters.Customer))
-        {
-            
-            reservations = reservations.Where(a =>
-                a.Id.ToString().Contains(queryParameters.Customer.ToLower()) || 
-                a.Customer != null && (
-                    a.Customer.FirstName.ToLower().Contains(queryParameters.Customer.ToLower()) || 
-                    a.Customer.LastName.ToLower().Contains(queryParameters.Customer.ToLower()) || 
-                    a.Customer.Email.ToLower().Contains(queryParameters.Customer.ToLower()) || 
-                    a.Customer.Phone.ToLower().Contains(queryParameters.Customer.ToLower()))
-            );
-        }
-        
-        if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
-            if (typeof(Reservation).GetProperty(queryParameters.SortBy) != null)
-            {
-                reservations = reservations.OrderByCustom(
-                    queryParameters.SortBy,
-                    queryParameters.SortOrder);
-            }
-        }
+             queryString += $"@Page = {queryParameters.Page}, "; // Page
+             queryString += $"@Limit = {queryParameters.Size}, "; // Size
+             if (typeof(Customer).GetProperty(queryParameters.SortBy) != null)
+                 queryString += $"@OrderBy = {queryParameters.SortBy}, "; // orderBy
+             queryString += $"@OrderByAsc = {(queryParameters.SortOrder.ToLower() == "asc" ? 1 : 0)} "; // orderByAsc
+         
+             var reservations =
+                 _context.Reservations
+                     .FromSqlRaw<ReservationEntity>(queryString)
+                     // .Include(r=>r.Customer)
+                     // .Include(r=>r.Area)
+                     // .Include(r=>r.Sitting)
+                     .AsNoTracking()
+                     .AsEnumerable()
+             ;
 
-        reservations = reservations
-            .Skip(queryParameters.Size * (queryParameters.Page - 1))
-            .Take(queryParameters.Size);
+        //
+        // if (queryParameters.Area.Length > 0)
+        //     reservations = reservations.Where(r => r.Area != null && queryParameters.Area.Contains(r.Area.Name));
+        //
+        // if (queryParameters.Sitting.Length > 0)
+        //     reservations = reservations.Where(r =>
+        //         r.Sitting != null && queryParameters.Area.Contains(r.Sitting.Type.ToString()));
 
+
+        // if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
+        //     reservations = reservations.Where(a =>
+        //         a.Id.ToString().Contains(queryParameters.SearchTerm.ToLower()) ||
+        //         (a.Customer != null && (
+        //             a.Customer.FirstName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+        //             a.Customer.LastName.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+        //             a.Customer.Email.ToLower().Contains(queryParameters.SearchTerm.ToLower()) ||
+        //             a.Customer.Phone.ToLower().Contains(queryParameters.SearchTerm.ToLower())))
+        //     );
+
+        // if (!string.IsNullOrEmpty(queryParameters.Customer))
+        //     reservations = reservations.Where(a =>
+        //         a.Id.ToString().Contains(queryParameters.Customer.ToLower()) ||
+        //         (a.Customer != null && (
+        //             a.Customer.FirstName.ToLower().Contains(queryParameters.Customer.ToLower()) ||
+        //             a.Customer.LastName.ToLower().Contains(queryParameters.Customer.ToLower()) ||
+        //             a.Customer.Email.ToLower().Contains(queryParameters.Customer.ToLower()) ||
+        //             a.Customer.Phone.ToLower().Contains(queryParameters.Customer.ToLower())))
+        //     );
+
+        // if (!string.IsNullOrEmpty(queryParameters.SortBy))
+        //     if (typeof(Reservation).GetProperty(queryParameters.SortBy) != null)
+        //         reservations = reservations.OrderByCustom(
+        //             queryParameters.SortBy,
+        //             queryParameters.SortOrder);
+        //
+        // reservations = reservations
+        //     .Skip(queryParameters.Size * (queryParameters.Page - 1))
+        //     .Take(queryParameters.Size);
+        //
+        // var tables = _context.Tables
+        //     .FromSqlInterpolated($"SELECT * FROM Tables LEFT JOIN ReservationsTables RT on Tables.Id = RT.TableId WHERE rt.ReservationId is not null");
+        
         var mapper = _mappingConfiguration.CreateMapper();
-        var reservationsDto = reservations.Select(r => new {
+        
+        var customers = await _context.Customers
+            .FromSqlInterpolated(
+                $"SELECT DISTINCT c.id, c.firstname, c.lastname, c.email, c.phone, c.isVip FROM Customers c LEFT JOIN Reservations r on c.Id = r.CustomerId WHERE r.Id is NOT null")
+            .AsNoTracking()
+            .ToListAsync();
+        var sittings = await _context.Sittings
+            .FromSqlInterpolated(
+                $"SELECT DISTINCT s.Id, s.Capacity, s.Type, s.StartTime, s.EndTime, s.VenueId FROM Sittings s LEFT JOIN Reservations r on s.Id = r.SittingId WHERE r.Id is NOT null")
+            .AsNoTracking()
+            .ToListAsync();
+        var areas = await _context.Areas
+            .FromSqlInterpolated(
+                $"SELECT * FROM Areas")
+            .AsNoTracking()
+            .ToListAsync();
+        
+
+        var tableRes = await _context.Tables
+            .Select(t => new
+            {
+                t.Id,
+                t.Type,
+                t.Capacity,
+                t.AreaId,
+                t.xPosition,
+                t.yPosition,
+                ReservationId = t.ReservationTables.Select(rt=>rt.ReservationId)
+            })
+            .ToListAsync();
+
+            
+        
+        var reservationsDto = reservations.Select((r) =>  new
+        {
             r.Id,
             r.CustomerId,
-            Customer = mapper.Map<Models.DTO.Customer>(r.Customer),
+            Customer = mapper.Map<Models.DTO.Customer>(customers.FirstOrDefault(c=>c.Id == r.CustomerId)),
             r.SittingId,
-            Sitting = mapper.Map<Models.DTO.Sitting>(r.Sitting),
+            Sitting = mapper.Map<Models.DTO.Sitting>(sittings.FirstOrDefault(c=>c.Id == r.SittingId)),
             r.AreaId,
-            Area = mapper.Map<Models.DTO.Area>(r.Area),
+            Area = mapper.Map<Models.DTO.Area>(areas.FirstOrDefault(c=>c.Id == r.AreaId)),
             r.DateTime,
             r.Duration,
             r.NoGuests,
             r.Source,
             r.Status,
             r.Notes,
-            r.Tables
+            Tables = tableRes.Where(t => t.ReservationId.Contains(r.Id)).ToList()
         });
+        
+        
+        // Parallel.ForEach(customers, customer=>
+        //     customer.Reservations = reservations.Where(r=>r.CustomerId == customer.Id).ToList());
 
-        return Ok(new {reservations = await reservationsDto.ToArrayAsync()});
+        
+
+        return Ok(new { reservations = reservationsDto });
     }
 
     /// <summary>
@@ -527,7 +566,7 @@ public class ReservationsV2Controller : ControllerBase
 
         if (tables == null) return NotFound();
 
-        return Ok(tables);
+        return Ok(new { tables });
     }
 
     // PUT: api/Reservations/5/table?tableId
@@ -545,8 +584,7 @@ public class ReservationsV2Controller : ControllerBase
     {
         // if (id != reservation.Id) return BadRequest();
 
-        var table = await _reservationService.AddTableToReservation(id, tableId);
-        if (!table) return BadRequest();
+        await _reservationService.AddTableToReservation(id, tableId);
         return NoContent();
     }
 

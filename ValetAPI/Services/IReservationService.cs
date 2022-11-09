@@ -33,7 +33,7 @@ public interface IReservationService
     Task DeleteReservationAsync(int reservationId);
     Task<IEnumerable<Table>> GetReservationTables(int reservationId);
 
-    Task<bool> AddTableToReservation(int reservationId, int tableId);
+    Task AddTableToReservation(int reservationId, int tableId);
     Task<bool> AddTablesToReservation(int reservationId, int[] tableIds);
     Task<bool> RemoveTableFromReservation(int reservationId, int tableId);
     Task<bool> RemoveTablesFromReservation(int reservationId, int[] tableIds);

@@ -25,7 +25,7 @@ public class QueryParameters
 
         set
         {
-            if (value is "asc" or "desc") _sortOrder = value;
+            if (value?.ToLower() is "asc" or "desc") _sortOrder = value;
         }
     }
 

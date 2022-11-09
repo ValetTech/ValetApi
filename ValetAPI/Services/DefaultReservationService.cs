@@ -62,7 +62,8 @@ public class DefaultReservationService : IReservationService
         if (_context.Reservations == null) return null;
         var reservation = await _context.Reservations
             .Include(r => r.Customer)
-            .Include(r => r.Tables)
+            .Include(r => r.ReservationTables)
+            .ThenInclude(rt=>rt.Table)
             .Include(r => r.Sitting)
             .Include(r=>r.Area)
             .Include(r => r.Venue)
@@ -140,41 +141,54 @@ public class DefaultReservationService : IReservationService
 
     public async Task<IEnumerable<Table>> GetReservationTables(int reservationId)
     {
-        if (_context.Reservations == null) return null;
-        var reservationEntity = await _context.Reservations.Include(r => r.Tables)
-            .FirstOrDefaultAsync(r => r.Id == reservationId);
+        // if (_context.Reservations == null) return null;
+        // var reservationEntity = await _context.Reservations
+        //     .Include(r => r.ReservationTables)
+        //     .ThenInclude(rt=>rt.Table)
+        //     .FirstOrDefaultAsync(r => r.Id == reservationId);
+        // if (reservationEntity?.ReservationTables == null) return null;
 
-        if (reservationEntity?.Tables == null) return null;
-
+        var resEntities = 
+            await _context.Tables.FromSqlInterpolated($"EXECUTE GetReservationsTables {reservationId}").Cast<TableEntity>().ToListAsync();
+        
         var mapper = _mappingConfiguration.CreateMapper();
 
-        return mapper.Map<Table[]>(reservationEntity.Tables);
+        return mapper.Map<Table[]>(resEntities);
     }
 
-    public async Task<bool> AddTableToReservation(int reservationId, int tableId)
+    public async Task AddTableToReservation(int reservationId, int tableId)
     {
-        if (_context.Reservations == null) return false;
+        if (_context.Reservations == null) throw new HttpResponseException(404);
         var reservationEntity = await _context.Reservations
             .Include(r => r.Sitting)
             .FirstOrDefaultAsync(r => r.Id == reservationId);
 
+        var resArea = await _context.Areas.Include(a=>a.Tables).FirstOrDefaultAsync(a => a.Id == reservationEntity.AreaId);
+        // var table = await _context.Tables.FirstOrDefaultAsync(t=>t.Id == tableId);
+        // if(table == null) throw new HttpResponseException(404);
+        // var tableEntity = resArea?.Tables.FirstOrDefault(t=>t.Id == tableId);
+        var tableEntity = await _context.Tables.FirstOrDefaultAsync(t=>t.Id == tableId);
+        // var tables = await GetAvailableTableEntitiesForSittingAsync(reservationEntity.Sitting.Id);
 
-        var tables = await GetAvailableTableEntitiesForSittingAsync(reservationEntity.Sitting.Id);
+        if (tableEntity?.AreaId != resArea?.Id)
+            throw new HttpResponseException(400, "Table not in Reservations Area.");
 
-        var tableEntity = await tables.FirstOrDefaultAsync(t => t.Id == tableId);
 
-        if (reservationEntity == null || tableEntity == null) return false;
-
-        reservationEntity.Tables.Add(tableEntity);
+        if (reservationEntity == null || tableEntity == null) throw new HttpResponseException(404);
+        
+        reservationEntity.ReservationTables.Add(new ReservationTable{ReservationId = reservationEntity.Id, TableId = tableEntity.Id});
+        // areas.Select(id => new AreaSittingEntity {AreaId = id, SittingId = sitting.Id})
+        // _context.ReservationsTables.Add(new ReservationTable
+        //     { ReservationId = reservationEntity.Id, TableId = tableEntity.Id });
+        // reservationEntity.ReservationTables.Add(new ReservationTable{ReservationId = reservationEntity.Id, TableId = tableEntity.Id});
         await _context.SaveChangesAsync();
-        return true;
     }
 
     public async Task<bool> AddTablesToReservation(int reservationId, int[] tableIds)
     {
         if (_context.Reservations == null) return false;
         var reservationEntity = await _context.Reservations
-            .Include(r => r.Tables)
+            .Include(r => r.ReservationTables)
             .Include(r => r.Sitting)
             .FirstOrDefaultAsync(r => r.Id == reservationId);
 
@@ -189,7 +203,7 @@ public class DefaultReservationService : IReservationService
             .AsQueryable();
 
 
-        reservationEntity.Tables.AddRange(tables);
+        reservationEntity.ReservationTables.AddRange(tables.Select(t=>new ReservationTable{ReservationId = reservationEntity.Id, TableId = t.Id}));
 
         await _context.SaveChangesAsync();
         return true;
@@ -202,8 +216,8 @@ public class DefaultReservationService : IReservationService
         var tableEntity = await _context.Tables.FindAsync(tableId);
 
         if (reservationEntity == null || tableEntity == null) return false;
-
-        reservationEntity.Tables.Remove(tableEntity);
+        reservationEntity.ReservationTables.RemoveAll(t => t.TableId == tableEntity.Id);
+        // reservationEntity.Tables.Remove();
         await _context.SaveChangesAsync();
         return true;
     }
@@ -213,7 +227,7 @@ public class DefaultReservationService : IReservationService
         if (_context.Reservations == null) return false;
 
         var reservationEntity = await _context.Reservations
-            .Include(r => r.Tables)
+            .Include(r => r.ReservationTables)
             .FirstOrDefaultAsync(r => r.Id == reservationId);
 
         var tableEntity = await _context.Tables
@@ -222,7 +236,8 @@ public class DefaultReservationService : IReservationService
 
         if (reservationEntity == null || tableEntity == null) return false;
 
-        reservationEntity.Tables.RemoveAll(t => tableIds.Contains(t.Id));
+        reservationEntity.ReservationTables.RemoveAll(t => tableIds.Contains(t.TableId));
+        // reservationEntity.Tables.RemoveAll(t => tableIds.Contains(t.Id));
 
         await _context.SaveChangesAsync();
         return true;
@@ -234,7 +249,7 @@ public class DefaultReservationService : IReservationService
 
         var sitting = await _context.Sittings
             .Include(s => s.Reservations)
-            .ThenInclude(r => r.Tables)
+            .ThenInclude(r => r.ReservationTables)
             .Include(s => s.AreaSittings)
             .ThenInclude(a => a.Area)
             .ThenInclude(a => a.Tables)
@@ -244,15 +259,18 @@ public class DefaultReservationService : IReservationService
         if (sitting == null) return null;
 
         var takenTables = sitting.Reservations
-            .SelectMany(r => r.Tables, (reservation, tableEntity) => tableEntity)
+            .SelectMany(r => r.ReservationTables, (reservation, tableEntity) => tableEntity)
             .AsQueryable();
+        
 
         var tables = sitting!.AreaSittings
             .Select(sa => sa.Area)
             // .Select(a => a.Tables)
             .SelectMany(a => a.Tables)
-            .Where(t => !takenTables.Contains(t))
+            .Where(t => !takenTables.Select(rt=>rt.TableId).Contains(t.Id))
             .AsQueryable();
+        
+        
 
         return tables;
     }

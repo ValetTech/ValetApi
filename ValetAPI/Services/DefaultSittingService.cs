@@ -171,7 +171,7 @@ public class DefaultSittingService : ISittingService
 
         var sitting = await _context.Sittings
             .Include(s => s.Reservations)
-            .ThenInclude(r => r.Tables)
+            .ThenInclude(r => r.ReservationTables)
             .Include(s => s.AreaSittings)
             .ThenInclude(a => a.Area)
             .ThenInclude(a => a.Tables)
@@ -187,10 +187,10 @@ public class DefaultSittingService : ISittingService
             .AsQueryable();
 
         var takenTables = sitting.Reservations
-            .SelectMany(r => r.Tables, (reservation, tableEntity) => tableEntity)
+            .SelectMany(r => r.ReservationTables, (reservation, tableEntity) => tableEntity)
             .AsQueryable();
 
-        var tables = allTables.Where(t => !takenTables.Contains(t));
+        var tables = allTables.Where(t => !takenTables.Select(x=>x.Table).Contains(t));
 
         return tables?.ProjectTo<Table>(_mappingConfiguration);
     }
@@ -201,13 +201,13 @@ public class DefaultSittingService : ISittingService
 
         var sitting = await _context.Sittings
             .Include(s => s.Reservations)
-            .ThenInclude(r => r.Tables)
+            .ThenInclude(r => r.ReservationTables)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
         if (sitting == null) return null;
 
         var tables = sitting.Reservations
-            .SelectMany(r => r.Tables, (reservation, tableEntity) => tableEntity)
+            .SelectMany(r => r.ReservationTables, (reservation, tableEntity) => tableEntity)
             .AsQueryable();
 
         return tables?.ProjectTo<Table>(_mappingConfiguration);

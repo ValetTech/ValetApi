@@ -12,8 +12,8 @@ using ValetAPI.Data;
 namespace ValetAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221108070955_AddReservationTables")]
-    partial class AddReservationTables
+    [Migration("20221108222800_Remove res id from tables")]
+    partial class Removeresidfromtables
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -224,21 +224,6 @@ namespace ValetAPI.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("ReservationEntityTableEntity", b =>
-                {
-                    b.Property<int>("ReservationsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TablesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ReservationsId", "TablesId");
-
-                    b.HasIndex("TablesId");
-
-                    b.ToTable("ReservationEntityTableEntity");
                 });
 
             modelBuilder.Entity("ValetAPI.Models.AreaEntity", b =>
@@ -476,7 +461,7 @@ namespace ValetAPI.Migrations
                     b.ToTable("Reservations");
                 });
 
-            modelBuilder.Entity("ValetAPI.Models.ReservationTables", b =>
+            modelBuilder.Entity("ValetAPI.Models.ReservationTable", b =>
                 {
                     b.Property<int>("ReservationId")
                         .HasColumnType("int");
@@ -486,9 +471,7 @@ namespace ValetAPI.Migrations
 
                     b.HasKey("ReservationId", "TableId");
 
-                    b.HasIndex("TableId");
-
-                    b.ToTable("ReservationTable");
+                    b.ToTable("ReservationsTables");
                 });
 
             modelBuilder.Entity("ValetAPI.Models.SittingEntity", b =>
@@ -735,9 +718,6 @@ namespace ValetAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Capacity")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ReservationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -1142,21 +1122,6 @@ namespace ValetAPI.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ReservationEntityTableEntity", b =>
-                {
-                    b.HasOne("ValetAPI.Models.ReservationEntity", null)
-                        .WithMany()
-                        .HasForeignKey("ReservationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ValetAPI.Models.TableEntity", null)
-                        .WithMany()
-                        .HasForeignKey("TablesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ValetAPI.Models.AreaEntity", b =>
                 {
                     b.HasOne("ValetAPI.Models.VenueEntity", "Venue")
@@ -1222,18 +1187,18 @@ namespace ValetAPI.Migrations
                     b.Navigation("Venue");
                 });
 
-            modelBuilder.Entity("ValetAPI.Models.ReservationTables", b =>
+            modelBuilder.Entity("ValetAPI.Models.ReservationTable", b =>
                 {
                     b.HasOne("ValetAPI.Models.ReservationEntity", "Reservation")
-                        .WithMany()
+                        .WithMany("ReservationTables")
                         .HasForeignKey("ReservationId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("ValetAPI.Models.TableEntity", "Table")
-                        .WithMany()
-                        .HasForeignKey("TableId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("ReservationTables")
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Reservation");
@@ -1277,11 +1242,21 @@ namespace ValetAPI.Migrations
                     b.Navigation("Reservations");
                 });
 
+            modelBuilder.Entity("ValetAPI.Models.ReservationEntity", b =>
+                {
+                    b.Navigation("ReservationTables");
+                });
+
             modelBuilder.Entity("ValetAPI.Models.SittingEntity", b =>
                 {
                     b.Navigation("AreaSittings");
 
                     b.Navigation("Reservations");
+                });
+
+            modelBuilder.Entity("ValetAPI.Models.TableEntity", b =>
+                {
+                    b.Navigation("ReservationTables");
                 });
 
             modelBuilder.Entity("ValetAPI.Models.VenueEntity", b =>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ValetAPI.Data;
 
@@ -11,9 +12,10 @@ using ValetAPI.Data;
 namespace ValetAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221108222653_AddReservationTables")]
+    partial class AddReservationTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -469,8 +471,6 @@ namespace ValetAPI.Migrations
 
                     b.HasKey("ReservationId", "TableId");
 
-                    b.HasIndex("TableId");
-
                     b.ToTable("ReservationsTables");
                 });
 
@@ -718,6 +718,9 @@ namespace ValetAPI.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ReservationId")
                         .HasColumnType("int");
 
                     b.Property<string>("Type")
@@ -1197,7 +1200,7 @@ namespace ValetAPI.Migrations
 
                     b.HasOne("ValetAPI.Models.TableEntity", "Table")
                         .WithMany("ReservationTables")
-                        .HasForeignKey("TableId")
+                        .HasForeignKey("ReservationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

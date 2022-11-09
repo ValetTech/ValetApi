@@ -5,7 +5,9 @@ namespace ValetAPI.Models;
 public class ReservationEntity
 {
     public int Id { get; set; }
+    public int CustomerId { get; set; }
     public CustomerEntity Customer { get; set; }
+    public int SittingId { get; set; }
     public SittingEntity Sitting { get; set; }
 
     [DisplayFormat(DataFormatString = "{g}", ApplyFormatInEditMode = true)]
@@ -24,7 +26,7 @@ public class ReservationEntity
     public AreaEntity Area { get; set; }
 
     //public Venue Venue { get; set; }
-    public List<TableEntity> Tables { get; set; } = new();
+    public List<ReservationTable> ReservationTables { get; set; } = new();
     public State Status { get; set; } = State.Pending;
     public string? Notes { get; set; }
 }

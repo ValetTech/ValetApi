@@ -1,6 +1,6 @@
 namespace ValetAPI.Models;
 
-public class ReservationTables
+public class ReservationTable
 {
     public int ReservationId { get; set; }
     public ReservationEntity? Reservation { get; set; }
