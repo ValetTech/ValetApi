@@ -155,4 +155,57 @@ public class AuthController : ControllerBase
 
         return token;
     }
+    
+    /// <summary>
+    /// Login
+    /// </summary>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    [HttpPost]
+    [Route("login-god")]
+    public async Task<IActionResult> LoginGod([FromBody] LoginModel model)
+    {
+        var user = await _userManager.FindByEmailAsync(model.Email);
+        if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+        {
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var authClaims = new List<Claim>
+            {
+                new(ClaimTypes.Name, user.UserName),
+                new(ClaimTypes.Email, user.Email),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+
+            var token = GetTokenYear(authClaims);
+
+            return Ok(new
+            {
+                // email = user.Email,
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo
+            });
+        }
+
+        return Unauthorized();
+        
+       
+    }
+    
+    private JwtSecurityToken GetTokenYear(List<Claim> authClaims)
+    {
+        var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
+
+        var token = new JwtSecurityToken(
+            _configuration["JWT:ValidIssuer"],
+            _configuration["JWT:ValidAudience"],
+            expires: DateTime.Now.AddYears(1),
+            claims: authClaims,
+            signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        );
+
+        return token;
+    }
 }
