@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ValetAPI.Data;
 using ValetAPI.Models;
 using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace ValetAPI.Controllers.API;
 
@@ -15,14 +17,14 @@ namespace ValetAPI.Controllers.API;
 [ApiController]
 public class SittingsV1Controller : ControllerBase
 {
+    private readonly IConfigurationProvider _mappingConfiguration;
     private readonly ISittingService _sittingService;
-    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
 
     /// <summary>
     ///     Sittings constructor
     /// </summary>
     /// <param name="sittingService"></param>
-    public SittingsV1Controller(ISittingService sittingService, AutoMapper.IConfigurationProvider mappingConfiguration)
+    public SittingsV1Controller(ISittingService sittingService, IConfigurationProvider mappingConfiguration)
     {
         _sittingService = sittingService;
         _mappingConfiguration = mappingConfiguration;
@@ -40,21 +42,21 @@ public class SittingsV1Controller : ControllerBase
     {
         var sittings = _sittingService.GetSittingsAsync();
 
-        if (queryParameters.Date.HasValue)
+        if (!string.IsNullOrEmpty(queryParameters.Date))
         {
-            var date = queryParameters.Date.Value.Date;
+            var date = DateTime.Parse(queryParameters.Date).Date;
             sittings = sittings.Where(s => date <= s.EndTime.Date && date >= s.StartTime.Date);
         }
 
-        if (queryParameters.MinDateTime.HasValue)
+        if (!string.IsNullOrEmpty(queryParameters.MinDateTime))
         {
-            var dateTime = queryParameters.MinDateTime.Value;
+            var dateTime = DateTime.Parse(queryParameters.MinDateTime);
             sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
         }
-        
-        if (queryParameters.MaxDateTime.HasValue)
+
+        if (!string.IsNullOrEmpty(queryParameters.MaxDateTime))
         {
-            var dateTime = queryParameters.MaxDateTime.Value;
+            var dateTime = DateTime.Parse(queryParameters.MaxDateTime);
             sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
         }
 
@@ -69,41 +71,36 @@ public class SittingsV1Controller : ControllerBase
             var type = queryParameters.Type.Value;
             sittings = sittings.Where(s => s.Type == type);
         }
-        
+
         if (queryParameters.hasReservations.HasValue)
         {
             var hasReservations = queryParameters.hasReservations.Value;
             sittings = sittings.Where(s => s.Reservations.Any() == hasReservations);
         }
-        
+
         if (queryParameters.hasAreas.HasValue)
         {
             var hasAreas = queryParameters.hasAreas.Value;
             sittings = sittings.Where(s => s.Areas.Any() == hasAreas);
         }
-        
+
         if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
             sittings = sittings.Where(a => true
             );
-        }
-        
+
         if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
             if (typeof(Sitting).GetProperty(queryParameters.SortBy) != null)
-            {
                 sittings = sittings.OrderByCustom(
                     queryParameters.SortBy,
                     queryParameters.SortOrder);
-            }
-        }
-        
+
         sittings = sittings
             .Skip(queryParameters.Size * (queryParameters.Page - 1))
             .Take(queryParameters.Size);
-        
+
         var mapper = _mappingConfiguration.CreateMapper();
-        var sittingsDto = sittings.Select(s => new {
+        var sittingsDto = sittings.Select(s => new
+        {
             s.Id,
             s.Capacity,
             s.Type,
@@ -143,11 +140,11 @@ public class SittingsV1Controller : ControllerBase
     public async Task<ActionResult<Sitting>> CreateSitting(Sitting sitting)
     {
         var id = await _sittingService.CreateSittingAsync(sitting);
-        
+
         var entity = await _sittingService.GetSittingAsync(id);
         if (entity == null) return BadRequest();
-        
-        return CreatedAtAction($"GetSitting",new { id = entity.Id }, entity);
+
+        return CreatedAtAction("GetSitting", new { id = entity.Id }, entity);
     }
 
     /// <summary>
@@ -291,17 +288,20 @@ public class SittingsV1Controller : ControllerBase
 [ApiController]
 public class SittingsV2Controller : ControllerBase
 {
+    private readonly ApplicationDbContext _context;
+    private readonly IConfigurationProvider _mappingConfiguration;
     private readonly ISittingService _sittingService;
-    private readonly AutoMapper.IConfigurationProvider _mappingConfiguration;
 
     /// <summary>
     ///     Sittings constructor
     /// </summary>
     /// <param name="sittingService"></param>
-    public SittingsV2Controller(ISittingService sittingService, AutoMapper.IConfigurationProvider mappingConfiguration)
+    public SittingsV2Controller(ISittingService sittingService, IConfigurationProvider mappingConfiguration,
+        ApplicationDbContext context)
     {
         _sittingService = sittingService;
         _mappingConfiguration = mappingConfiguration;
+        _context = context;
     }
 
     /// <summary>
@@ -314,82 +314,66 @@ public class SittingsV2Controller : ControllerBase
     public async Task<ActionResult<IEnumerable<Sitting>>> GetSittings(
         [FromQuery] SittingQueryParameters queryParameters)
     {
-        var sittings = _sittingService.GetSittingsAsync();
-
-        if (queryParameters.Date.HasValue)
-        {
-            var date = queryParameters.Date.Value.Date;
-            sittings = sittings.Where(s => date <= s.EndTime.Date && date >= s.StartTime.Date);
-        }
-
-        if (queryParameters.MinDateTime.HasValue)
-        {
-            var dateTime = queryParameters.MinDateTime.Value;
-            sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
-        }
-        
-        if (queryParameters.MaxDateTime.HasValue)
-        {
-            var dateTime = queryParameters.MaxDateTime.Value;
-            sittings = sittings.Where(s => dateTime <= s.EndTime && dateTime >= s.StartTime);
-        }
-
+        var queryString = "EXECUTE dbo.GetSittings ";
+        if (!string.IsNullOrEmpty(queryParameters.MinDateTime))
+            queryString += $"@MinDate = '{queryParameters.MinDateTime}', "; // MinDate
+        if (!string.IsNullOrEmpty(queryParameters.MaxDateTime))
+            queryString += $"@MaxDate = '{queryParameters.MaxDateTime}', "; // MaxDate
+        if (!string.IsNullOrEmpty(queryParameters.Date))
+            queryString += $"@Date = '{queryParameters.Date}', "; // Date
         if (queryParameters.Capacity.HasValue)
-        {
-            var capacity = queryParameters.Capacity.Value;
-            sittings = sittings.Where(s => s.Capacity == capacity);
-        }
+            queryString += $"@Capacity = {queryParameters.Capacity.Value}, "; // Capacity
 
-        if (queryParameters.Type.HasValue)
-        {
-            var type = queryParameters.Type.Value;
-            sittings = sittings.Where(s => s.Type == type);
-        }
-        
-        if (queryParameters.hasReservations.HasValue)
-        {
-            var hasReservations = queryParameters.hasReservations.Value;
-            sittings = sittings.Where(s => s.Reservations.Any() == hasReservations);
-        }
-        
-        if (queryParameters.hasAreas.HasValue)
-        {
-            var hasAreas = queryParameters.hasAreas.Value;
-            sittings = sittings.Where(s => s.Areas.Any() == hasAreas);
-        }
-        
-        if (!string.IsNullOrEmpty(queryParameters.SearchTerm))
-        {
-            sittings = sittings.Where(a => true
-            );
-        }
-        
-        if (!string.IsNullOrEmpty(queryParameters.SortBy))
-        {
-            if (typeof(Sitting).GetProperty(queryParameters.SortBy) != null)
-            {
-                sittings = sittings.OrderByCustom(
-                    queryParameters.SortBy,
-                    queryParameters.SortOrder);
-            }
-        }
-        
-        sittings = sittings
-            .Skip(queryParameters.Size * (queryParameters.Page - 1))
-            .Take(queryParameters.Size);
-        
+        if (queryParameters.Id.HasValue)
+            queryString += $"@Id = {queryParameters.Id.Value}, "; // Id
+
+        if (queryParameters.Areas.Any())
+            queryString += $"@Areas = '{string.Join(',', queryParameters.Areas)}', "; // Areas
+        if (queryParameters.Types.Any())
+            queryString += $"@Type = '{string.Join(',', queryParameters.Types)}', "; // Types
+        else if (queryParameters.Type.HasValue)
+            queryString += $"@Type = {queryParameters.Type.Value}, "; // Type 
+
+        queryString += $"@Page = {queryParameters.Page}, "; // Page
+        queryString += $"@Limit = {queryParameters.Size}, "; // Size
+        if (typeof(Sitting).GetProperty(queryParameters.SortBy) != null)
+            queryString += $"@OrderBy = {queryParameters.SortBy}, "; // orderBy
+        queryString += $"@OrderByAsc = {(queryParameters.SortOrder.ToLower() == "asc" ? 1 : 0)} "; // orderByAsc
+
+
+        var sittings =
+                _context.Sittings
+                    .FromSqlRaw(queryString)
+                    .AsNoTracking()
+                    .AsEnumerable()
+            ;
+        var areas = await _context.Areas
+            .FromSqlInterpolated(
+                $"SELECT * FROM Areas")
+            .AsNoTracking()
+            .ToListAsync();
+
+        var reservations = await _context.Reservations
+            .FromSqlInterpolated(
+                $"SELECT * FROM Reservations")
+            .AsNoTracking()
+            .ToListAsync();
+
+
         var mapper = _mappingConfiguration.CreateMapper();
-        var sittingsDto = sittings.Select(s => new {
+        var sittingsDto = sittings.Select(s => new
+        {
             s.Id,
             s.Capacity,
             s.Type,
             s.StartTime,
             s.EndTime,
-            Areas = mapper.Map<Models.DTO.Area[]>(s.Areas),
-            Reservations = mapper.Map<Models.DTO.Reservation[]>(s.Reservations)
+            Areas = mapper.Map<Models.DTO.Area[]>(areas.Where(c =>
+                c.AreaSittings.Select(sa => sa.SittingId).Contains(s.Id))),
+            Reservations = mapper.Map<Models.DTO.Reservation[]>(reservations.Where(r => r.SittingId == s.Id).ToArray())
         });
 
-        return Ok(new { sittings = await sittingsDto.ToArrayAsync() });
+        return Ok(new { sittings = sittingsDto });
     }
 
 
@@ -420,11 +404,11 @@ public class SittingsV2Controller : ControllerBase
     public async Task<ActionResult<Sitting>> CreateSitting(Sitting sitting)
     {
         var id = await _sittingService.CreateSittingAsync(sitting);
-        
+
         var entity = await _sittingService.GetSittingAsync(id);
         if (entity == null) return BadRequest();
-        
-        return CreatedAtAction($"GetSitting",new { id = entity.Id }, entity);
+
+        return CreatedAtAction("GetSitting", new { id = entity.Id }, entity);
     }
 
     /// <summary>

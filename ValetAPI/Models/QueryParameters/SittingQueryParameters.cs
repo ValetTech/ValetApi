@@ -8,9 +8,9 @@ namespace ValetAPI.Models.QueryParameters;
 public class SittingQueryParameters : QueryParameters
 {
     // FILTER
-    public DateTime? Date { get; set; }
-    public DateTime? MinDateTime { get; set; }
-    public DateTime? MaxDateTime { get; set; }
+    public string? Date { get; set; } = null;
+    public string? MinDateTime { get; set; } = null;
+    public string? MaxDateTime { get; set; } = null;
 
     public int? Capacity { get; set; } = null;
 
@@ -20,4 +20,11 @@ public class SittingQueryParameters : QueryParameters
 
     public bool? hasAreas { get; set; } = null;
     public bool? hasReservations { get; set; } = null;
+
+    public string[] Areas { get; set; } = Array.Empty<string>();
+    public string[] Types { get; set; } = Array.Empty<string>();
+    public int? Id { get; set; } = null;
+    
+
+
 }

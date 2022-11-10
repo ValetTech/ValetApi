@@ -337,9 +337,12 @@ public class ReservationsV2Controller : ControllerBase
         //YYYY-MM-DDTHH:MM:SS
 
             var queryString = $"EXECUTE dbo.GetReservations ";
-            queryString += $"@MinDate = `{queryParameters.MinDate}`, "; // MinDate
-            queryString += $"@MaxDate = `{queryParameters.MaxDate}`, "; // MaxDate
-            queryString += $"@Date = `{queryParameters.Date}`, "; // Date
+            if(!string.IsNullOrEmpty(queryParameters.MinDate))
+            queryString += $"@MinDate = '{queryParameters.MinDate}', "; // MinDate
+            if(!string.IsNullOrEmpty(queryParameters.MaxDate))
+                queryString += $"@MaxDate = '{queryParameters.MaxDate}', "; // MaxDate
+            if(!string.IsNullOrEmpty(queryParameters.Date))
+                queryString += $"@Date = '{queryParameters.Date}', "; // Date
             if (queryParameters.Duration.HasValue) 
                 queryString += $"@Duration = {queryParameters.Duration.Value}, "; // Duration
             if (queryParameters.Guests.HasValue) 
@@ -354,10 +357,15 @@ public class ReservationsV2Controller : ControllerBase
             queryString += $"@Customer = {queryParameters.Customer ?? "null"}, "; // Customer
              if (queryParameters.hasTables.HasValue) 
                  queryString += $"@hasTables = {queryParameters.hasTables.Value}, "; // hasTables
+             
+             if(!string.IsNullOrEmpty(queryParameters.Areas?.Trim()))
+                 queryString += $"@Areas = '{queryParameters.Areas}', "; // Areas
+             if(!string.IsNullOrEmpty(queryParameters.Sittings?.Trim()))
+                 queryString += $"@Sittings = '{queryParameters.Sittings}', "; // Sittings
             
              queryString += $"@Page = {queryParameters.Page}, "; // Page
              queryString += $"@Limit = {queryParameters.Size}, "; // Size
-             if (typeof(Customer).GetProperty(queryParameters.SortBy) != null)
+             if (typeof(Reservation).GetProperty(queryParameters.SortBy) != null)
                  queryString += $"@OrderBy = {queryParameters.SortBy}, "; // orderBy
              queryString += $"@OrderByAsc = {(queryParameters.SortOrder.ToLower() == "asc" ? 1 : 0)} "; // orderByAsc
          

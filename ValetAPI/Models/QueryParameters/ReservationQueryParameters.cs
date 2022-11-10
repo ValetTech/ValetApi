@@ -30,9 +30,9 @@ public class ReservationQueryParameters : QueryParameters
     [JsonConverter(typeof(StringEnumConverter))]
     public State? Status { get; set; } = null;
 
-    public string[] Area { get; set; } = Array.Empty<string>();
+    public string? Areas { get; set; } = null;
 
-    public string[] Sitting { get; set; } = Array.Empty<string>();
+    public string? Sittings { get; set; } = null;
 
     // SEARCH
     public string? Customer { get; set; } = null;
