@@ -46,15 +46,15 @@ public class ReservationsV1Controller : ControllerBase
         //YYYY-MM-DDTHH:MM:SS
         var reservations = await _reservationService.GetReservationsAsync();
 
-        if (queryParameters.MinDate.HasValue)
-            reservations = reservations.Where(r => r.DateTime >= queryParameters.MinDate.Value);
+        if (!string.IsNullOrEmpty(queryParameters.MinDate))
+            reservations = reservations.Where(r => r.DateTime >= DateTime.Parse(queryParameters.MinDate));
 
-        if (queryParameters.MaxDate.HasValue)
-            reservations = reservations.Where(r => r.DateTime <= queryParameters.MaxDate.Value);
+        if (!string.IsNullOrEmpty(queryParameters.MaxDate))
+            reservations = reservations.Where(r => r.DateTime <= DateTime.Parse(queryParameters.MaxDate));
 
-        if (queryParameters.Date.HasValue)
+        if (!string.IsNullOrEmpty(queryParameters.Date))
         {
-            var date = queryParameters.Date.Value;
+            var date = DateTime.Parse(queryParameters.Date);
             if (date.Kind == DateTimeKind.Unspecified)
                 date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
             reservations = reservations.Where(r => r.DateTime.Date == date);
@@ -337,12 +337,9 @@ public class ReservationsV2Controller : ControllerBase
         //YYYY-MM-DDTHH:MM:SS
 
             var queryString = $"EXECUTE dbo.GetReservations ";
-            if (queryParameters.MinDate.HasValue) 
-                queryString += $"@MinDate = {queryParameters.MinDate.Value}, "; // MinDate
-            if (queryParameters.MaxDate.HasValue) 
-                queryString += $"@MaxDate = {queryParameters.MaxDate.Value}, "; // MaxDate
-            if (queryParameters.Date.HasValue) 
-                queryString += $"@Date = {queryParameters.Date.Value}, "; // Date
+            queryString += $"@MinDate = `{queryParameters.MinDate}`, "; // MinDate
+            queryString += $"@MaxDate = `{queryParameters.MaxDate}`, "; // MaxDate
+            queryString += $"@Date = `{queryParameters.Date}`, "; // Date
             if (queryParameters.Duration.HasValue) 
                 queryString += $"@Duration = {queryParameters.Duration.Value}, "; // Duration
             if (queryParameters.Guests.HasValue) 

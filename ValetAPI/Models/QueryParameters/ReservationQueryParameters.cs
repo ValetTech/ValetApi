@@ -7,9 +7,9 @@ namespace ValetAPI.Models.QueryParameters;
 public class ReservationQueryParameters : QueryParameters
 {
     // FILTER
-    public DateTime? MinDate { get; set; } = null;
-    public DateTime? MaxDate { get; set; } = null;
-    public DateTime? Date { get; set; } = null;
+    public string? MinDate { get; set; } = null;
+    public string? MaxDate { get; set; } = null;
+    public string? Date { get; set; } = null;
 
     public int? Duration { get; set; } = null;
     public int? Guests { get; set; } = null;
