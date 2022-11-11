@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Data;
@@ -537,6 +538,27 @@ public class ReservationsV2Controller : ControllerBase
         //     return NotFound();
         return NoContent();
     }
+    
+    /// <summary>
+    ///     Patch reservation.
+    /// </summary>
+    /// <param name="id">Reservation Id</param>
+    /// <param name="reservation">Reservation Patch Object</param>
+    /// <returns></returns>
+    [HttpPatch("{id:int}", Name = nameof(PatchReservation))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> PatchReservation(int id, [FromBody] JsonPatchDocument<ReservationEntity> patchRes)
+    {
+        if (patchRes == null) return BadRequest(ModelState);
+        var reservation = await _context.Reservations.FirstOrDefaultAsync(r=>r.Id == id);
+        if(reservation == null) return BadRequest();
+        patchRes.ApplyTo(reservation, ModelState);
+        await _context.SaveChangesAsync();
+
+        return !ModelState.IsValid ? BadRequest(ModelState) : new ObjectResult(reservation);
+    }
+   
 
 
     /// <summary>

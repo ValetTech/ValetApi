@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Auth;
+using ValetAPI.Data;
 using ValetAPI.Models;
 using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
@@ -237,6 +238,8 @@ public class AreasV2Controller : ControllerBase
     private readonly IAreaService _areaService;
     private readonly ITableService _tablesService;
     private readonly IConfigurationProvider _mappingConfiguration;
+    private readonly ApplicationDbContext _context;
+    
 
 
     /// <summary>
@@ -244,11 +247,12 @@ public class AreasV2Controller : ControllerBase
     /// </summary>
     /// <param name="areaService"></param>
     /// <param name="tablesService"></param>
-    public AreasV2Controller(IAreaService areaService, ITableService tablesService, IConfigurationProvider mappingConfiguration)
+    public AreasV2Controller(IAreaService areaService, ITableService tablesService, IConfigurationProvider mappingConfiguration, ApplicationDbContext context)
     {
         _areaService = areaService;
         _tablesService = tablesService;
         _mappingConfiguration = mappingConfiguration;
+        _context = context;
     }
 
     /// <summary>

@@ -5,8 +5,10 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -136,6 +138,7 @@ public static class Program
             {
                 options.Filters.Add<JsonExceptionFilter>();
                 options.Filters.Add<HttpResponseExceptionFilter>();
+                options.InputFormatters.Insert(0, MyJPIF.GetJsonPatchInputFormatter());
             }
             );
         builder.Services.AddRouting(options => options.LowercaseUrls = true);
@@ -168,7 +171,7 @@ public static class Program
                 new QueryStringApiVersionReader("api-version"),
                 new HeaderApiVersionReader("X-Version"),
                 new MediaTypeApiVersionReader("ver"));
-            options.ApiVersionSelector = new DefaultApiVersionSelector(options);
+            options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
             // options.ApiVersionSelector = new CurrentImplementationApiVersionSelector(options);
         });
         
@@ -274,5 +277,25 @@ internal class SwaggerSchemaFilter : ISchemaFilter
             if (key.EndsWith(suffix) || key.StartsWith(prefix))
                 keys.Add(key);
         foreach (var key in keys) context.SchemaRepository.Schemas.Remove(key);
+    }
+}
+
+
+public static class MyJPIF
+{
+    public static NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter()
+    {
+        var builder = new ServiceCollection()
+            .AddLogging()
+            .AddMvc()
+            .AddNewtonsoftJson()
+            .Services.BuildServiceProvider();
+
+        return builder
+            .GetRequiredService<IOptions<MvcOptions>>()
+            .Value
+            .InputFormatters
+            .OfType<NewtonsoftJsonPatchInputFormatter>()
+            .First();
     }
 }

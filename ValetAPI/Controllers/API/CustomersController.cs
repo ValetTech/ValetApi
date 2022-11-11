@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -334,6 +335,26 @@ public class CustomersV2Controller : ControllerBase
         await _customerService.UpdateCustomerAsync(customer);
 
         return NoContent();
+    }
+    
+    /// <summary>
+    ///     Patch customer.
+    /// </summary>
+    /// <param name="id">Customer Id</param>
+    /// <param name="customer">Customer Patch Object</param>
+    /// <returns></returns>
+    [HttpPatch("{id:int}", Name = nameof(PatchCustomer))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(204)]
+    public async Task<IActionResult> PatchCustomer(int id, [FromBody] JsonPatchDocument<CustomerEntity> patchCus)
+    {
+        if (patchCus == null) return BadRequest(ModelState);
+        var customer = await _context.Customers.FirstOrDefaultAsync(r=>r.Id == id);
+        if(customer == null) return BadRequest();
+        patchCus.ApplyTo(customer, ModelState);
+        await _context.SaveChangesAsync();
+        return !ModelState.IsValid ? BadRequest(ModelState) : new ObjectResult(customer);
+        
     }
 
 
