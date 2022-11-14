@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -37,7 +38,25 @@ public class AuthController : ControllerBase
         _configuration = configuration;
     }
 
+    /// <summary>
+    ///  Get user details
+    /// </summary>
+    /// <returns></returns>
+    // [HttpGet(nameof(GetCurrentUser))]
+    // [Route("me")]
+    // [ProducesResponseType(404)]
+    // [ProducesResponseType(401)]
+    // [ProducesResponseType(200)]
+    // [Authorize]
+    // public async Task<IActionResult> GetCurrentUser()
+    // {
+    //     var user = await _userManager.GetUserAsync(User);
+    //     if (user == null) return NotFound();
+    //     return Ok(new {user = user});
+    // }
     
+
+
     /// <summary>
     /// Login
     /// </summary>

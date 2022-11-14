@@ -132,7 +132,7 @@ public class TablesV2Controller : ControllerBase
     {
         var tables = await _tableService.GetTablesAsync();
         if (tables == null) return NotFound();
-        return Ok(new { tables });
+        return Ok(new { tables = tables });
     }
 
     /// <summary>
