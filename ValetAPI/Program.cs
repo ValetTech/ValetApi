@@ -59,6 +59,7 @@ public static class Program
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders();
+        
         builder.Services.AddControllersWithViews();
 
         builder.Services.AddAuthorization();

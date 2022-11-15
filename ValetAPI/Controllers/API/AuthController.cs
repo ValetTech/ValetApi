@@ -67,30 +67,39 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         var user = await _userManager.FindByEmailAsync(model.Email);
-        if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+        if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password)) return Unauthorized();
+        var userRoles = await _userManager.GetRolesAsync(user);
+        var jti = Guid.NewGuid().ToString();
+
+        var authClaims = new List<Claim>
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
+            new(JwtRegisteredClaimNames.Sub, "firebase-adminsdk-xqrh1@one-button-63ff9.iam.gserviceaccount.com"),
+            new(JwtRegisteredClaimNames.Jti, jti),
+            new(JwtRegisteredClaimNames.Iat, DateTime.Now.Ticks.ToString(), ClaimValueTypes.Integer64),
+            
 
-            var authClaims = new List<Claim>
-            {
-                new(ClaimTypes.Name, user.UserName),
-                new(ClaimTypes.Email, user.Email),
-                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
 
-            foreach (var userRole in userRoles) authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            new(ClaimTypes.Name, user.UserName),
+            new(ClaimTypes.Email, user.Email),
+            new("email", user.Email),
+            new("display_name", user.UserName),
+            new("uid",user.Id),
+            new("created_time", DateTime.Now.ToString()),
+            new("photo_url", ""),
+            new("phone_number", ""),
+                
+        };
+        authClaims.AddRange(userRoles.Select(userRole => new Claim(ClaimTypes.Role, userRole)));
 
-            var token = GetToken(authClaims);
+        var token = GetToken(authClaims);
 
-            return Ok(new
-            {
-                // email = user.Email,
-                token = new JwtSecurityTokenHandler().WriteToken(token),
-                expiration = token.ValidTo
-            });
-        }
+        return Ok(new
+        {
+            // email = user.Email,
+            token = new JwtSecurityTokenHandler().WriteToken(token),
+            expiration = token.ValidTo
+        });
 
-        return Unauthorized();
     }
 
     /// <summary>
@@ -160,7 +169,7 @@ public class AuthController : ControllerBase
         return Ok(new Response {Status = "Success", Message = "User created successfully!"});
     }
 
-    private JwtSecurityToken GetToken(List<Claim> authClaims)
+    private JwtSecurityToken GetToken(IEnumerable<Claim> authClaims)
     {
         var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Secret"]));
 

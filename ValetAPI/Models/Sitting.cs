@@ -4,8 +4,9 @@ namespace ValetAPI.Models;
 
 public class Sitting
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
     public int Capacity { get; set; }
+    public Guid? GroupId { get; set; } = null;
     public SittingType Type { get; set; }
 
     [DisplayFormat(DataFormatString = "{g}", ApplyFormatInEditMode = true)]

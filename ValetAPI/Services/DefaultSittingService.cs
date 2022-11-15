@@ -1,6 +1,7 @@
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Data;
+using ValetAPI.Filters;
 using ValetAPI.Models;
 using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
@@ -80,7 +81,70 @@ public class DefaultSittingService : ISittingService
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not create sitting.");
 
-        return entity.Entity.Id;
+        if (!entity.Entity.Id.HasValue)
+        {
+            throw new HttpResponseException(400, "Something went wrong.");
+        }
+        
+        return entity.Entity.Id.Value;
+    }
+
+    public async Task CreateSittingsAsync(RecurringSitting sitting)
+    {
+        // Title, Areas, Type, Capacity, Start, End/Duration?, Rrule, GroupId
+        // Rrule = { freq, interval, byWeekDay, dtStart, until, count, 
+        //  freq= day,week,month
+        //  interval = int
+        //  byWeekDay = [SU,MO,TU,WE,TH,FR,SA]
+        //  until = dateTime
+        //  count = int
+
+        // Past not editable and remove groupId
+        var sittings = new List<SittingEntity>();
+        var freq = "day";
+        var interval = 1;
+        var until = new DateTime();
+        var byWeekDay = new []{"SU","MO","TU","WE","TH","FR","SA"};
+        var weekDays = new[] { 1, 1, 0, 1, 1, 1, 1 };
+        var duration = 60;
+
+        DateTime increment(DateTime i)
+        {
+            var dateTime = freq switch
+            {
+                "day" => i.AddDays(interval),
+                "week" => i.AddDays(interval * 7),
+                "month" => i.AddMonths(1),
+                _ => i
+            };
+            return dateTime;
+        }
+        
+
+        for (var i = sitting.StartTime; i <= until; i = increment(i))
+        {
+            Parallel.ForEach(weekDays, j => sittings.Add(new SittingEntity()));
+            
+            sittings.Add(new SittingEntity
+            {
+                // Title, Areas, Type, Capacity, Start, End/Duration?, Rrule, GroupId
+                StartTime = i,
+                EndTime = i.AddMinutes(duration),
+                
+            });
+        }
+        var mapper = _mappingConfiguration.CreateMapper();
+
+        sitting.StartTime.ToUniversalTime();
+        // sitting.EndTime.ToUniversalTime();
+        
+        
+
+        var entity = await _context.Sittings.AddAsync(mapper.Map<SittingEntity>(sitting));
+        
+        var created = await _context.SaveChangesAsync();
+        if (created < 1) throw new InvalidOperationException("Could not create sitting.");
+
     }
 
     public async Task DeleteSittingAsync(int sittingId)
@@ -215,6 +279,7 @@ public class DefaultSittingService : ISittingService
 
     public async Task<Sitting> AddAreasToSitting(int sittingId, IEnumerable<int> areas)
     {
+        
         if (_context.Sittings == null) return null;
 
         var sitting = await _context.Sittings
@@ -223,7 +288,7 @@ public class DefaultSittingService : ISittingService
             .Include(s => s.Reservations)
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
-        sitting.AreaSittings.AddRange(areas.Select(id => new AreaSittingEntity {AreaId = id, SittingId = sitting.Id}));
+        sitting.AreaSittings.AddRange(areas.Select(id => new AreaSittingEntity {AreaId = id, SittingId = sitting.Id.GetValueOrDefault()}));
 
         if (sitting == null) return null;
 

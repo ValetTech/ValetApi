@@ -4,7 +4,8 @@ namespace ValetAPI.Models;
 
 public class SittingEntity
 {
-    public int Id { get; set; }
+    public int? Id { get; set; }
+    public Guid? GroupId { get; set; } = null;
     public int Capacity { get; set; }
     public SittingType Type { get; set; }
 

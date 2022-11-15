@@ -26,6 +26,9 @@ public interface ISittingService
     // Create Sitting
     Task<int> CreateSittingAsync(Sitting sitting);
 
+    // Create recurring sittings
+    Task CreateSittingsAsync(RecurringSitting sitting);
+
     // Delete Sitting by Id
     Task DeleteSittingAsync(int sittingId);
 

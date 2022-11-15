@@ -369,7 +369,7 @@ public class SittingsV2Controller : ControllerBase
             s.StartTime,
             s.EndTime,
             Areas = mapper.Map<Models.DTO.Area[]>(areas.Where(c =>
-                c.AreaSittings.Select(sa => sa.SittingId).Contains(s.Id))),
+                c.AreaSittings.Select(sa => sa.SittingId).Contains(s.Id ?? -1))),
             Reservations = mapper.Map<Models.DTO.Reservation[]>(reservations.Where(r => r.SittingId == s.Id).ToArray())
         });
 
@@ -401,7 +401,7 @@ public class SittingsV2Controller : ControllerBase
     [HttpPost("", Name = nameof(CreateSitting))]
     [ProducesResponseType(400)]
     [ProducesResponseType(201)]
-    public async Task<ActionResult<Sitting>> CreateSitting(Sitting sitting)
+    public async Task<ActionResult<Sitting>> CreateSitting([FromBody]Sitting sitting)
     {
         var id = await _sittingService.CreateSittingAsync(sitting);
 

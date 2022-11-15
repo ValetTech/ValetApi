@@ -197,7 +197,7 @@ public class DefaultReservationService : IReservationService
 
         // var tableEntity = await _context.Tables.FindAsync(tableIds);
 
-        var availableTables = await GetAvailableTableEntitiesForSittingAsync(reservationEntity.Sitting.Id);
+        var availableTables = await GetAvailableTableEntitiesForSittingAsync(reservationEntity.SittingId);
 
         var tables = availableTables
             .Where(t => tableIds.Contains(t.Id))
