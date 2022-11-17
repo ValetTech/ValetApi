@@ -142,7 +142,7 @@ public class TablesV2Controller : ControllerBase
     public async Task<ActionResult<IEnumerable<Table>>> GetTables([FromQuery] TableQueryParameters queryParameters)
     {
         //-- Id, Type,Capacity, AreaId, SittingId, SittingType, Date, MinDate, MaxDate, IsPositioned, HasReservations, 
-        var queryString = $"EXECUTE dbo.GetReservations ";
+        var queryString = $"EXECUTE dbo.GetTables ";
             if(!string.IsNullOrEmpty(queryParameters.MinDate))
             queryString += $"@MinDate = '{queryParameters.MinDate}', "; // MinDate
             if(!string.IsNullOrEmpty(queryParameters.MaxDate))
