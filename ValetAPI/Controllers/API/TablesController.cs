@@ -1,7 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ValetAPI.Data;
 using ValetAPI.Models;
+using ValetAPI.Models.QueryParameters;
 using ValetAPI.Services;
+using IConfigurationProvider = AutoMapper.IConfigurationProvider;
 
 namespace ValetAPI.Controllers.API;
 
@@ -14,6 +18,7 @@ namespace ValetAPI.Controllers.API;
 public class TablesV1Controller : ControllerBase
 {
     private readonly ITableService _tableService;
+    
 
     /// <summary>
     ///     Tables controller
@@ -33,6 +38,8 @@ public class TablesV1Controller : ControllerBase
     [ProducesResponseType(200)]
     public async Task<ActionResult<IEnumerable<Table>>> GetTables()
     {
+        
+             
         var tables = await _tableService.GetTablesAsync();
         if (tables == null) return NotFound();
         return Ok(new { tables });
@@ -111,14 +118,18 @@ public class TablesV1Controller : ControllerBase
 public class TablesV2Controller : ControllerBase
 {
     private readonly ITableService _tableService;
+    private readonly ApplicationDbContext _context;
+    private readonly IConfigurationProvider _mappingConfiguration;
 
     /// <summary>
     ///     Tables controller
     /// </summary>
     /// <param name="tableService"></param>
-    public TablesV2Controller(ITableService tableService)
+    public TablesV2Controller(ITableService tableService, ApplicationDbContext context, IConfigurationProvider mappingConfiguration)
     {
         _tableService = tableService;
+        _context = context;
+        _mappingConfiguration = mappingConfiguration;
     }
 
     /// <summary>
@@ -128,10 +139,43 @@ public class TablesV2Controller : ControllerBase
     [HttpGet("", Name = nameof(GetTables))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
-    public async Task<ActionResult<IEnumerable<Table>>> GetTables()
+    public async Task<ActionResult<IEnumerable<Table>>> GetTables([FromQuery] TableQueryParameters queryParameters)
     {
-        var tables = await _tableService.GetTablesAsync();
-        if (tables == null) return NotFound();
+        //-- Id, Type,Capacity, AreaId, SittingId, SittingType, Date, MinDate, MaxDate, IsPositioned, HasReservations, 
+        var queryString = $"EXECUTE dbo.GetReservations ";
+            if(!string.IsNullOrEmpty(queryParameters.MinDate))
+            queryString += $"@MinDate = '{queryParameters.MinDate}', "; // MinDate
+            if(!string.IsNullOrEmpty(queryParameters.MaxDate))
+                queryString += $"@MaxDate = '{queryParameters.MaxDate}', "; // MaxDate
+            if(!string.IsNullOrEmpty(queryParameters.Date))
+                queryString += $"@Date = '{queryParameters.Date}', "; // Date
+            if (queryParameters.Capacity.HasValue) 
+                queryString += $"@Duration = {queryParameters.Capacity.Value}, "; // Capacity
+            queryString += $"@Id = {queryParameters.Id ?? "null"}, "; // Id
+            queryString += $"@AreaId = {queryParameters.AreaId ?? "null"}, "; // AreaId
+            queryString += $"@SittingId = {queryParameters.SittingId ?? "null"}, "; // SittingId
+            queryString += $"@SittingType = {queryParameters.SittingType ?? "null"}, "; // SittingType
+            
+             if (queryParameters.IsPositioned.HasValue) 
+                 queryString += $"@IsPositioned = {queryParameters.IsPositioned.Value}, "; // IsPositioned
+             if (queryParameters.HasReservations.HasValue) 
+                 queryString += $"@HasReservations = {queryParameters.HasReservations.Value}, "; // HasReservations
+             
+            
+             queryString += $"@Page = {queryParameters.Page}, "; // Page
+             queryString += $"@Limit = {queryParameters.Size}, "; // Size
+             if (typeof(Table).GetProperty(queryParameters.SortBy) != null)
+                 queryString += $"@OrderBy = {queryParameters.SortBy}, "; // orderBy
+             queryString += $"@OrderByAsc = {(queryParameters.SortOrder.ToLower() == "asc" ? 1 : 0)} "; // orderByAsc
+         
+             
+             
+             var tables =
+                 _context.Tables
+                     .FromSqlRaw<TableEntity>(queryString)
+                     .AsNoTracking()
+                     .AsEnumerable()
+             ;
         return Ok(new { tables = tables });
     }
 
