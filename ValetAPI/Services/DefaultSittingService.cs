@@ -75,8 +75,17 @@ public class DefaultSittingService : ISittingService
 
         sitting.StartTime.ToUniversalTime();
         sitting.EndTime.ToUniversalTime();
-
         var entity = await _context.Sittings.AddAsync(mapper.Map<SittingEntity>(sitting));
+
+        if (sitting.AreaIds.Any())
+        {
+            
+            entity.Entity.AreaSittings
+                .AddRange(sitting.AreaIds
+                    .Select(id => new AreaSittingEntity {AreaId = int.Parse(id), SittingId = entity.Entity.Id.GetValueOrDefault() }));
+
+        }
+
         
         var created = await _context.SaveChangesAsync();
         if (created < 1) throw new InvalidOperationException("Could not create sitting.");

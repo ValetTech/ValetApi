@@ -14,6 +14,7 @@ public class Sitting
 
     public int VenueId { get; set; }
 
+    [JsonIgnore] public List<string> AreaIds { get; set; } = new();
     [JsonIgnore] public List<Area> Areas { get; set; } = new();
 
     [JsonIgnore] public List<Reservation> Reservations { get; set; } = new();

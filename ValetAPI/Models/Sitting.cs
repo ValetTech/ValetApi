@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace ValetAPI.Models;
 
@@ -25,6 +26,7 @@ public class Sitting
 
     // public List<AreaEntity> Areas { get; set; }
     // [JsonIgnore]
+    public List<string> AreaIds { get; set; } = new();
     public List<Area> Areas { get; set; } = new();
     public List<Reservation> Reservations { get; set; } = new();
 }

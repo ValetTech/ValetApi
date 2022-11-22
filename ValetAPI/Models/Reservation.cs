@@ -16,9 +16,7 @@ public class Reservation
     public int AreaId { get; set; }
     public Area? Area { get; set; }
 
-    [DataType(DataType.Time)]
-    [DisplayFormat(DataFormatString = "{hh:mm tt}", ApplyFormatInEditMode = true)]
-    // [DisplayFormat(DataFormatString = "{g}", ApplyFormatInEditMode = true)]
+    [DataType(DataType.DateTime)]
     [Display(Name = "Reservation Time")]
     [Required]
     public DateTime DateTime { get; set; }

@@ -504,7 +504,7 @@ public class ReservationsV2Controller : ControllerBase
     /// <summary>
     ///     Create a new reservation.
     /// </summary>
-    /// <param name="reservation">Reservation Id</param>
+    /// <param name="reservation">Reservation Object</param>
     /// <returns></returns>
     [HttpPost("", Name = nameof(CreateReservation))]
     [ProducesResponseType(400)]

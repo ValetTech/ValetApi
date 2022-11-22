@@ -323,6 +323,10 @@ public class SittingsV2Controller : ControllerBase
             queryString += $"@Date = '{queryParameters.Date}', "; // Date
         if (queryParameters.Capacity.HasValue)
             queryString += $"@Capacity = {queryParameters.Capacity.Value}, "; // Capacity
+        if (queryParameters.hasAreas.HasValue)
+            queryString += $"@HasAreas = {queryParameters.hasAreas.Value}, "; // HasAreas
+        if (queryParameters.hasReservations.HasValue)
+            queryString += $"@HasReservations = {queryParameters.hasReservations.Value}, "; // HasAreas
 
         if (queryParameters.Id.HasValue)
             queryString += $"@Id = {queryParameters.Id.Value}, "; // Id
@@ -350,6 +354,8 @@ public class SittingsV2Controller : ControllerBase
         var areas = await _context.Areas
             .FromSqlInterpolated(
                 $"SELECT * FROM Areas")
+            .Include(a=>a.AreaSittings)
+            .ThenInclude(sa=>sa.Sitting)
             .AsNoTracking()
             .ToListAsync();
 
@@ -368,8 +374,7 @@ public class SittingsV2Controller : ControllerBase
             s.Type,
             s.StartTime,
             s.EndTime,
-            Areas = mapper.Map<Models.DTO.Area[]>(areas.Where(c =>
-                c.AreaSittings.Select(sa => sa.SittingId).Contains(s.Id ?? -1))),
+            Areas = mapper.Map<Models.DTO.Area[]>(areas.Where(a => a.AreaSittings.Any(sa=>sa.SittingId == s.Id))),
             Reservations = mapper.Map<Models.DTO.Reservation[]>(reservations.Where(r => r.SittingId == s.Id).ToArray())
         });
 
