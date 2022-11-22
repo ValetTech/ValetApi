@@ -310,7 +310,7 @@ public class AreasV2Controller : ControllerBase
             a.Width,
             a.Height,
             a.Tables,
-            sittings = mapper.Map<Models.DTO.Sitting[]>(a.Sittings)
+            Sittings = mapper.Map<Models.DTO.Sitting[]>(a.Sittings)
         });
         // Outta left join
         return Ok(new {areas = await areasDto.ToArrayAsync()});

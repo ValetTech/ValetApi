@@ -48,11 +48,13 @@ public class MapperProfile : Profile
         CreateMap<Venue, VenueEntity>().ReverseMap();
 
         CreateMap<Area, Models.DTO.Area>().ReverseMap();
+        CreateMap<Table, Models.DTO.Table>().ReverseMap();
         CreateMap<Customer, Models.DTO.Customer>().ReverseMap();
         CreateMap<Reservation, Models.DTO.Reservation>().ReverseMap();
         CreateMap<Sitting, Models.DTO.Sitting>().ReverseMap();
         
         CreateMap<AreaEntity, Models.DTO.Area>().ReverseMap();
+        CreateMap<TableEntity, Models.DTO.Table>().ReverseMap();
         CreateMap<CustomerEntity, Models.DTO.Customer>().ReverseMap();
         CreateMap<ReservationEntity, Models.DTO.Reservation>().ReverseMap();
         CreateMap<SittingEntity, Models.DTO.Sitting>().ReverseMap();

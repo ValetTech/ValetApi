@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ValetAPI.Data;
@@ -176,7 +177,28 @@ public class TablesV2Controller : ControllerBase
                      .AsNoTracking()
                      .AsEnumerable()
              ;
-        return Ok(new { tables = tables });
+             var reservations = _context.Reservations
+                 .Include((r)=>r.ReservationTables)
+                 .AsNoTracking()
+                 .ToArray();
+             var areas = _context.Areas
+                 .AsNoTracking()
+                 .ToArray();
+             var mapper = _mappingConfiguration.CreateMapper();
+
+             var tableDTO = tables.Select(t => new
+             {
+                t.Id,
+                t.Type, 
+                t.xPosition,
+                t.yPosition,
+                t.Capacity,
+                t.AreaId,
+                Area = areas.FirstOrDefault(a=> a.Id == t.AreaId),
+                Reservations = mapper.Map<Models.DTO.Reservation[]>(reservations.Where(r => r.ReservationTables.Any(rt=>rt.TableId == t.Id))),
+             });
+             
+        return Ok(new { tables = tableDTO });
     }
 
     /// <summary>
