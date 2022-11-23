@@ -352,9 +352,9 @@ public class ReservationsV2Controller : ControllerBase
             queryString += $"@CustomerId = {queryParameters.CustomerId ?? "null"}, "; // CustomerId
             queryString += $"@SittingId = {queryParameters.SittingId ?? "null"}, "; // SittingId
             if (queryParameters.Source.HasValue) 
-            queryString += $"@Source = {queryParameters.Source}, "; // Source
+            queryString += $"@Source = {queryParameters.Source.Value}, "; // Source
             if (queryParameters.Status.HasValue) 
-                queryString += $"@Status = {queryParameters.Status}, "; // Status
+                queryString += $"@Status = {queryParameters.Status.Value}, "; // Status
             queryString += $"@Customer = {queryParameters.Customer ?? "null"}, "; // Customer
              if (queryParameters.hasTables.HasValue) 
                  queryString += $"@hasTables = {queryParameters.hasTables.Value}, "; // hasTables
