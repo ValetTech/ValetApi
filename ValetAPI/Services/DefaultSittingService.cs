@@ -173,13 +173,51 @@ public class DefaultSittingService : ISittingService
         
         sitting.StartTime.ToUniversalTime();
         sitting.EndTime.ToUniversalTime();
-
+        
         var entity = await _context.Sittings.FirstOrDefaultAsync(v => v.Id == sitting.Id);
         if (entity == null) return;
 
         _context.Entry(entity).CurrentValues.SetValues(mapper.Map<SittingEntity>(sitting));
-        var created = await _context.SaveChangesAsync();
-        if (created < 1) throw new InvalidOperationException("Could not update sitting.");
+
+        if (sitting.Areas?.Any() != null)
+        {
+            var areaSittingEntities = _context.AreaSittings
+                .Where(sa=>sa.SittingId == sitting.Id)
+                .AsSplitQuery();
+            _context.AreaSittings
+                .RemoveRange(areaSittingEntities);
+            _context.AreaSittings
+                .AddRange(sitting.Areas.Select(a=>new AreaSittingEntity
+                {
+                    AreaId = a.Id,
+                    SittingId = sitting.Id.GetValueOrDefault()
+                }));
+        }
+        
+        if (sitting.AreaIds?.Any() != null)
+        {
+            var areaSittingEntities = _context.AreaSittings
+                .Where(sa=>sa.SittingId == sitting.Id)
+                .AsSplitQuery();
+            _context.AreaSittings
+                .RemoveRange(areaSittingEntities);
+            _context.AreaSittings
+                .AddRange(sitting.AreaIds.Select(id=>new AreaSittingEntity
+                {
+                    AreaId = int.Parse(id),
+                    SittingId = sitting.Id.GetValueOrDefault()
+                }));
+        }
+
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            throw new HttpResponseException(400, e.Message);
+        }
     }
 
     public async Task<IEnumerable<Reservation>> GetReservationsAsync(int sittingId)

@@ -22,11 +22,11 @@ public class ReservationQueryParameters : QueryParameters
 
     
 
-    [EnumDataType(typeof(SittingType))]
+    [EnumDataType(typeof(Source))]
     [JsonConverter(typeof(StringEnumConverter))]
     public Source? Source { get; set; } = null;
 
-    [EnumDataType(typeof(SittingType))]
+    [EnumDataType(typeof(State))]
     [JsonConverter(typeof(StringEnumConverter))]
     public State? Status { get; set; } = null;
 
