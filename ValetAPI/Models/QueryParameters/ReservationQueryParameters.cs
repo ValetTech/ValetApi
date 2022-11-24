@@ -19,6 +19,7 @@ public class ReservationQueryParameters : QueryParameters
     public string? Id { get; set; } = null;
     public string? CustomerId { get; set; } = null;
     public string? SittingId { get; set; } = null;
+    public string? AreaId { get; set; } = null;
 
     
 
