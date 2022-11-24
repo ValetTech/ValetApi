@@ -173,6 +173,7 @@ public class DefaultSittingService : ISittingService
         
         sitting.StartTime.ToUniversalTime();
         sitting.EndTime.ToUniversalTime();
+        if (!(sitting.VenueId > 0)) sitting.VenueId = 1;
         
         var entity = await _context.Sittings.FirstOrDefaultAsync(v => v.Id == sitting.Id);
         if (entity == null) return;

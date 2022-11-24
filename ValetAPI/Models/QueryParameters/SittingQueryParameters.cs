@@ -13,6 +13,7 @@ public class SittingQueryParameters : QueryParameters
     public string? MaxDateTime { get; set; } = null;
 
     public int? Capacity { get; set; } = null;
+    public string? Title { get; set; } = null;
 
     [EnumDataType(typeof(SittingType))]
     [JsonConverter(typeof(StringEnumConverter))]

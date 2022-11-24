@@ -327,7 +327,8 @@ public class SittingsV2Controller : ControllerBase
             queryString += $"@HasAreas = {queryParameters.hasAreas.Value}, "; // HasAreas
         if (queryParameters.hasReservations.HasValue)
             queryString += $"@HasReservations = {queryParameters.hasReservations.Value}, "; // HasAreas
-
+        if (!string.IsNullOrEmpty(queryParameters.Title))
+            queryString += $"@Title = '{queryParameters.Title}', "; // Title
         if (queryParameters.Id.HasValue)
             queryString += $"@Id = {queryParameters.Id.Value}, "; // Id
 
@@ -371,6 +372,7 @@ public class SittingsV2Controller : ControllerBase
         {
             s.Id,
             s.Capacity,
+            s.Title,
             s.Type,
             s.StartTime,
             s.EndTime,
