@@ -47,7 +47,7 @@
     <option name="AZURE_WEB_APP_SERVICE_PLAN_ID" value="/subscriptions/2454219a-2665-4f3f-84b5-3e46a9a1c66a/resourceGroups/Valet/providers/Microsoft.Web/serverfarms/ASP-Valet-9ee0" />
     <option name="AZURE_WEB_APP_SERVICE_PLAN_NAME" value="" />
     <option name="AZURE_WEB_APP_LOCATION" value="eastus" />
-    <option name="AZURE_WEB_APP_PRICING_TIER" value="B1" />
+    <option name="AZURE_WEB_APP_PRICING_TIER" value="" />
     <option name="AZURE_WEB_APP_NET_FRAMEWORK" value="4.7" />
     <option name="AZURE_WEB_APP_NET_CORE_RUNTIME" value="DOTNETCORE 2.1" />
     <option name="AZURE_WEB_APP_IS_DEPLOY_TO_SLOT" value="0" />
