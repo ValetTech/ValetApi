@@ -431,7 +431,7 @@ public class ReservationsV2Controller : ControllerBase
             .ToListAsync();
         var sittings = await _context.Sittings
             .FromSqlInterpolated(
-                $"SELECT DISTINCT s.Id, s.Capacity, s.Type, s.StartTime, s.EndTime, s.VenueId, s.GroupId FROM Sittings s LEFT JOIN Reservations r on s.Id = r.SittingId WHERE r.Id is NOT null")
+                $"SELECT DISTINCT s.Id, s.Capacity, s.Type, s.Title, s.StartTime, s.EndTime, s.VenueId, s.GroupId FROM Sittings s LEFT JOIN Reservations r on s.Id = r.SittingId WHERE r.Id is NOT null")
             .AsNoTracking()
             .ToListAsync();
         var areas = await _context.Areas
