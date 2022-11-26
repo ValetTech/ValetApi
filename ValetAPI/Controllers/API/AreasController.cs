@@ -230,7 +230,6 @@ public class AreasV1Controller : ControllerBase
 /// </summary>
 [ApiController]
 [ApiVersion("2.0")]
-[Authorize]
 [Route("api/areas")]
 [Produces("application/json")]
 public class AreasV2Controller : ControllerBase
@@ -419,6 +418,7 @@ public class AreasV2Controller : ControllerBase
     [HttpGet("{id:int}/tables", Name = nameof(GetAreaTables))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Table>>> GetAreaTables(int id)
     {
         var tables = await _areaService.GetTablesAsync(id);

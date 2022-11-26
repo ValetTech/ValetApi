@@ -303,7 +303,6 @@ public class ReservationsV1Controller : ControllerBase
 /// <summary>
 ///     Reservations controller v2
 /// </summary>
-[Authorize]
 [ApiVersion("2.0")]
 [Route("api/reservations")]
 [ApiController]
@@ -332,6 +331,7 @@ public class ReservationsV2Controller : ControllerBase
     [HttpGet("", Name = nameof(GetAllReservations))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Reservation>>> GetAllReservations(
         [FromQuery] ReservationQueryParameters queryParameters)
     {
@@ -492,6 +492,7 @@ public class ReservationsV2Controller : ControllerBase
     [HttpGet("{id:int}", Name = nameof(GetReservation))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<Reservation>> GetReservation(int id)
     {
         var reservation = await _reservationService.GetReservationAsync(id);
@@ -529,6 +530,7 @@ public class ReservationsV2Controller : ControllerBase
     [HttpPut("{id:int}", Name = nameof(UpdateReservation))]
     [ProducesResponseType(400)]
     [ProducesResponseType(204)]
+    [Authorize]
     public async Task<IActionResult> UpdateReservation(int id, [FromBody] Reservation reservation)
     {
         if (id != reservation.Id) return BadRequest();
@@ -549,6 +551,7 @@ public class ReservationsV2Controller : ControllerBase
     [HttpPatch("{id:int}", Name = nameof(PatchReservation))]
     [ProducesResponseType(400)]
     [ProducesResponseType(204)]
+    [Authorize]
     public async Task<IActionResult> PatchReservation(int id, [FromBody] JsonPatchDocument<ReservationEntity> patchRes)
     {
         if (patchRes == null) return BadRequest(ModelState);
@@ -588,6 +591,7 @@ public class ReservationsV2Controller : ControllerBase
     [HttpGet("{id:int}/tables", Name = nameof(GetReservationTables))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Table>>> GetReservationTables(int id)
     {
         var tables = await _reservationService.GetReservationTables(id);

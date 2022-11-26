@@ -282,7 +282,6 @@ public class SittingsV1Controller : ControllerBase
 /// <summary>
 ///     Sittings controller v2
 /// </summary>
-[Authorize]
 [ApiVersion("2.0")]
 [Route("api/sittings")]
 [ApiController]
@@ -315,6 +314,8 @@ public class SittingsV2Controller : ControllerBase
         [FromQuery] SittingQueryParameters queryParameters)
     {
         var queryString = "EXECUTE dbo.GetSittings ";
+        if (queryParameters.Id.HasValue)
+            queryString += $"@Id = {queryParameters.Id.Value}, "; // Id
         if (!string.IsNullOrEmpty(queryParameters.MinDateTime))
             queryString += $"@MinDate = '{queryParameters.MinDateTime}', "; // MinDate
         if (!string.IsNullOrEmpty(queryParameters.MaxDateTime))
@@ -329,8 +330,7 @@ public class SittingsV2Controller : ControllerBase
             queryString += $"@HasReservations = {queryParameters.hasReservations.Value}, "; // HasAreas
         if (!string.IsNullOrEmpty(queryParameters.Title))
             queryString += $"@Title = '{queryParameters.Title}', "; // Title
-        if (queryParameters.Id.HasValue)
-            queryString += $"@Id = {queryParameters.Id.Value}, "; // Id
+        
 
         if (queryParameters.Areas.Any())
             queryString += $"@Areas = '{string.Join(',', queryParameters.Areas)}', "; // Areas
@@ -409,6 +409,7 @@ public class SittingsV2Controller : ControllerBase
     [HttpPost("", Name = nameof(CreateSitting))]
     [ProducesResponseType(400)]
     [ProducesResponseType(201)]
+    
     public async Task<ActionResult<Sitting>> CreateSitting([FromBody]Sitting sitting)
     {
         var id = await _sittingService.CreateSittingAsync(sitting);
@@ -432,8 +433,64 @@ public class SittingsV2Controller : ControllerBase
     public async Task<IActionResult> UpdateSitting(int id, Sitting sitting)
     {
         if (id != sitting.Id) return BadRequest();
+        
+        if (!(sitting.VenueId > 0)) sitting.VenueId = 1;
 
-        await _sittingService.UpdateSittingAsync(sitting);
+        sitting.StartTime.ToUniversalTime();
+        sitting.EndTime.ToUniversalTime();
+
+        var queryString = "EXECUTE dbo.UpdateSitting ";
+            queryString += $"@Id = {sitting.Id}, "; // Id
+            queryString += $"@Capacity = '{sitting.Capacity}', "; // Capacity
+            queryString += $"@Type = '{sitting.Type}', "; // Type
+            queryString += $"@Title = '{sitting.Title}', "; // Title
+            queryString += $"@StartTime = '{sitting.StartTime.ToString("o", System.Globalization.CultureInfo.InvariantCulture)}', "; // StartTime
+            queryString += $"@EndTime = '{sitting.EndTime.ToString("o", System.Globalization.CultureInfo.InvariantCulture)}', "; // EndTime
+            queryString += (sitting?.GroupId != null) ? $"@GroupId = '{sitting.GroupId}', @UpdateGroup = 1 " : $"@GroupId = null, @UpdateGroup = 0 "; // GroupId
+        
+
+        var rows = _context.Database.ExecuteSqlRaw(queryString);
+
+        if (sitting.Areas?.Any() != null)
+        {
+            var areaSittingEntities = _context.AreaSittings
+                .Where(sa=>sa.SittingId == sitting.Id)
+                .AsSplitQuery();
+            _context.AreaSittings
+                .RemoveRange(areaSittingEntities);
+            _context.AreaSittings
+                .AddRange(sitting.Areas.Select(a=>new AreaSittingEntity
+                {
+                    AreaId = a.Id,
+                    SittingId = sitting.Id.GetValueOrDefault()
+                }));
+        }
+        
+        if (sitting.AreaIds?.Any() != null)
+        {
+            var areaSittingEntities = _context.AreaSittings
+                .Where(sa=>sa.SittingId == sitting.Id)
+                .AsSplitQuery();
+            _context.AreaSittings
+                .RemoveRange(areaSittingEntities);
+            _context.AreaSittings
+                .AddRange(sitting.AreaIds.Select(id=>new AreaSittingEntity
+                {
+                    AreaId = int.Parse(id),
+                    SittingId = sitting.Id.GetValueOrDefault()
+                }));
+        }
+        
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            return BadRequest();
+        }
+
+        // await _sittingService.UpdateSittingAsync(sitting);
 
         return NoContent();
     }
@@ -449,7 +506,28 @@ public class SittingsV2Controller : ControllerBase
     [ProducesResponseType(201)]
     public async Task<IActionResult> DeleteSitting(int id)
     {
-        await _sittingService.DeleteSittingAsync(id);
+        var rows = _context.Database.ExecuteSqlInterpolated(
+            $"EXECUTE dbo.DeleteSitting @Id = {id}, @UpdateGroup = 0 ");
+        
+        // await _sittingService.DeleteSittingAsync(id);
+        return NoContent();
+    }
+    
+    /// <summary>
+    ///     Delete group sittings.
+    /// </summary>
+    /// <param name="id">Group Id</param>
+    /// <returns></returns>
+    [Authorize(Roles = "Admin")]
+    [HttpDelete("{id}/group", Name = nameof(DeleteSittingGroup))]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(201)]
+    public async Task<IActionResult> DeleteSittingGroup(string id)
+    {
+        var rows = await _context.Database.ExecuteSqlRawAsync(
+            $"EXECUTE dbo.DeleteSittingGroup @GroupId = '{id}'");
+        
+        // await _sittingService.DeleteSittingAsync(id);
 
         return NoContent();
     }
@@ -462,6 +540,7 @@ public class SittingsV2Controller : ControllerBase
     [HttpGet("{id:int}/reservations", Name = nameof(GetSittingReservations))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Reservation>>> GetSittingReservations(int id)
     {
         var reservations = await _sittingService.GetReservationsAsync(id);
@@ -517,6 +596,7 @@ public class SittingsV2Controller : ControllerBase
     [HttpGet("{id:int}/tables", Name = nameof(GetSittingTables))]
     [ProducesResponseType(404)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<Table>>> GetSittingTables(int id,
         [FromQuery] SittingTableQueryParameters queryParameters)
     {
@@ -547,6 +627,7 @@ public class SittingsV2Controller : ControllerBase
     [HttpPost("{id:int}/areas", Name = nameof(AddAreasToSitting))]
     [ProducesResponseType(400)]
     [ProducesResponseType(200)]
+    [Authorize]
     public async Task<ActionResult<Sitting>> AddAreasToSitting(int id, [FromBody] List<int> areas)
     {
         var sitting = await _sittingService.AddAreasToSitting(id, areas);

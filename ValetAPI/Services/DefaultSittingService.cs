@@ -161,10 +161,16 @@ public class DefaultSittingService : ISittingService
         var sitting = await _context.Sittings
             .SingleOrDefaultAsync(a => a.Id == sittingId);
 
+        if (sitting?.GroupId != null)
+        {
+            _context.Sittings.FromSqlInterpolated($"EXECUTE DeleteSitting @GroupId = {sitting.GroupId}, @UpdateGroup = 1 ");
+            return;
+        };
         if (sitting == null) return;
+        _context.Sittings.FromSqlInterpolated($"EXECUTE DeleteSitting @Id = {sitting.Id}, @UpdateGroup = 0 ");
 
-        _context.Sittings.Remove(sitting);
-        await _context.SaveChangesAsync();
+        // _context.Sittings.Remove(sitting);
+        // await _context.SaveChangesAsync();
     }
 
     public async Task UpdateSittingAsync(Sitting sitting)
@@ -209,7 +215,6 @@ public class DefaultSittingService : ISittingService
                     SittingId = sitting.Id.GetValueOrDefault()
                 }));
         }
-
         
         try
         {
