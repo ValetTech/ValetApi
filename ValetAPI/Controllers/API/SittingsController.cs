@@ -376,6 +376,7 @@ public class SittingsV2Controller : ControllerBase
             s.Type,
             s.StartTime,
             s.EndTime,
+            s.GroupId,
             Areas = mapper.Map<Models.DTO.Area[]>(areas.Where(a => a.AreaSittings.Any(sa=>sa.SittingId == s.Id))),
             Reservations = mapper.Map<Models.DTO.Reservation[]>(reservations.Where(r => r.SittingId == s.Id).ToArray())
         });

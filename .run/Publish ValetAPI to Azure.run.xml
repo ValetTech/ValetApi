@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Publish ValetAPI to Azure" type="AzureDotNetWebAppPublish" factoryName="Azure Web App">
     <option name="AZURE_WEB_APP_PROJECT" value="$PROJECT_DIR$/ValetAPI/ValetAPI.csproj" />
-    <option name="AZURE_WEB_APP_SUBSCRIPTION_ID" value="" />
+    <option name="AZURE_WEB_APP_SUBSCRIPTION_ID" value="2454219a-2665-4f3f-84b5-3e46a9a1c66a" />
     <option name="AZURE_WEB_APP_IS_CREATE_APP" value="0" />
     <option name="AZURE_WEB_APP_ID" value="/subscriptions/2454219a-2665-4f3f-84b5-3e46a9a1c66a/resourceGroups/Valet/providers/Microsoft.Web/sites/valetapi" />
     <option name="AZURE_WEB_APP_NAME" value="" />
@@ -12,13 +12,13 @@
     <option name="AZURE_WEB_APP_SERVICE_PLAN_ID" value="/subscriptions/2454219a-2665-4f3f-84b5-3e46a9a1c66a/resourceGroups/Valet/providers/Microsoft.Web/serverfarms/ASP-Valet-9ee0" />
     <option name="AZURE_WEB_APP_SERVICE_PLAN_NAME" value="" />
     <option name="AZURE_WEB_APP_LOCATION" value="eastus" />
-    <option name="AZURE_WEB_APP_PRICING_TIER" value="" />
+    <option name="AZURE_WEB_APP_PRICING_TIER" value="B1" />
     <option name="AZURE_WEB_APP_NET_FRAMEWORK" value="4.7" />
     <option name="AZURE_WEB_APP_NET_CORE_RUNTIME" value="DOTNETCORE 2.1" />
     <option name="AZURE_WEB_APP_IS_DEPLOY_TO_SLOT" value="0" />
     <option name="AZURE_WEB_APP_SLOT_NAME" value="" />
     <option name="AZURE_WEB_APP_OPEN_BROWSER_PUBLISH" value="0" />
-    <option name="AZURE_SQL_DATABASE_SUBSCRIPTION_ID" value="" />
+    <option name="AZURE_SQL_DATABASE_SUBSCRIPTION_ID" value="2454219a-2665-4f3f-84b5-3e46a9a1c66a" />
     <option name="AZURE_SQL_DATABASE_IS_ENABLED" value="1" />
     <option name="AZURE_SQL_DATABASE_CONNECTION_STRING_NAME" value="DefaultConnection" />
     <option name="AZURE_SQL_DATABASE_IS_CREATE" value="0" />
